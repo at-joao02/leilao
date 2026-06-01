@@ -33,7 +33,9 @@ import { BidPayload } from '../../models/auction.models';
         @if (success()) {
           <div class="bg-emerald-500/20 border border-emerald-500/40 rounded-lg p-4 text-center">
             <p class="text-emerald-400 font-semibold text-lg">Lance registado!</p>
-            <p class="text-zinc-300 text-sm mt-1">Verifique o seu email para confirmação.</p>
+            @if (!payload.is_anonymous) {
+              <p class="text-zinc-300 text-sm mt-1">Verifique o seu email para confirmação.</p>
+            }
           </div>
         } @else {
 
@@ -48,48 +50,57 @@ import { BidPayload } from '../../models/auction.models';
             <!-- Anónimo toggle -->
             <label class="flex items-center gap-3 cursor-pointer select-none">
               <div class="relative">
-                <input type="checkbox" class="sr-only peer" [(ngModel)]="payload.is_anonymous" name="is_anonymous" />
+                <input type="checkbox" class="sr-only peer"
+                  [(ngModel)]="payload.is_anonymous" name="is_anonymous"
+                  (ngModelChange)="onAnonymousChange($event)" />
                 <div class="w-10 h-5 bg-zinc-700 rounded-full peer-checked:bg-violet-600 transition-colors"></div>
                 <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
               </div>
               <span class="text-sm text-zinc-300">Lance anónimo</span>
             </label>
 
-            <!-- Nome -->
-            <div>
-              <label class="block text-sm text-zinc-400 mb-1.5">Nome *</label>
-              <input type="text" name="name" required
-                [(ngModel)]="payload.name" #nameInput="ngModel"
-                class="w-full bg-zinc-800 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm
-                       focus:outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
-                placeholder="O seu nome" />
-              @if (nameInput.invalid && nameInput.touched) {
-                <p class="text-red-400 text-xs mt-1">Nome obrigatório.</p>
-              }
-            </div>
+            <!-- Campos de identidade — ocultados quando anónimo -->
+            @if (!payload.is_anonymous) {
+              <!-- Nome -->
+              <div>
+                <label class="block text-sm text-zinc-400 mb-1.5">Nome *</label>
+                <input type="text" name="name" required
+                  [(ngModel)]="payload.name" #nameInput="ngModel"
+                  class="w-full bg-zinc-800 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm
+                         focus:outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
+                  placeholder="O seu nome" />
+                @if (nameInput.invalid && nameInput.touched) {
+                  <p class="text-red-400 text-xs mt-1">Nome obrigatório.</p>
+                }
+              </div>
 
-            <!-- Email -->
-            <div>
-              <label class="block text-sm text-zinc-400 mb-1.5">Email *</label>
-              <input type="email" name="email" required email
-                [(ngModel)]="payload.email" #emailInput="ngModel"
-                class="w-full bg-zinc-800 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm
-                       focus:outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
-                placeholder="email@exemplo.com" />
-              @if (emailInput.invalid && emailInput.touched) {
-                <p class="text-red-400 text-xs mt-1">Email inválido.</p>
-              }
-            </div>
+              <!-- Email -->
+              <div>
+                <label class="block text-sm text-zinc-400 mb-1.5">Email *</label>
+                <input type="email" name="email" required email
+                  [(ngModel)]="payload.email" #emailInput="ngModel"
+                  class="w-full bg-zinc-800 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm
+                         focus:outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
+                  placeholder="email@exemplo.com" />
+                @if (emailInput.invalid && emailInput.touched) {
+                  <p class="text-red-400 text-xs mt-1">Email inválido.</p>
+                }
+              </div>
 
-            <!-- Empresa (opcional) -->
-            <div>
-              <label class="block text-sm text-zinc-400 mb-1.5">Empresa <span class="text-zinc-600">(opcional)</span></label>
-              <input type="text" name="company"
-                [(ngModel)]="payload.company"
-                class="w-full bg-zinc-800 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm
-                       focus:outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
-                placeholder="Nome da empresa" />
-            </div>
+              <!-- Empresa (opcional) -->
+              <div>
+                <label class="block text-sm text-zinc-400 mb-1.5">Empresa <span class="text-zinc-600">(opcional)</span></label>
+                <input type="text" name="company"
+                  [(ngModel)]="payload.company"
+                  class="w-full bg-zinc-800 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm
+                         focus:outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
+                  placeholder="Nome da empresa" />
+              </div>
+            } @else {
+              <div class="bg-zinc-800/50 border border-white/5 rounded-lg px-4 py-3 text-sm text-zinc-400">
+                A sua identidade não será associada ao lance.
+              </div>
+            }
 
             <!-- Valor -->
             <div>
@@ -136,7 +147,7 @@ export class BidModalComponent {
   private auctionSvc = inject(AuctionService);
 
   loading = signal(false);
-  error = signal('');
+  error   = signal('');
   success = signal(false);
 
   payload: BidPayload = {
@@ -146,6 +157,17 @@ export class BidModalComponent {
     amount: 0,
     is_anonymous: false,
   };
+
+  onAnonymousChange(isAnon: boolean) {
+    if (isAnon) {
+      this.payload.name    = 'Anónimo';
+      this.payload.email   = 'anonimo@leilao.local';
+      this.payload.company = '';
+    } else {
+      this.payload.name  = '';
+      this.payload.email = '';
+    }
+  }
 
   onBackdropClick(e: MouseEvent) {
     if (e.target === e.currentTarget) this.close.emit();
