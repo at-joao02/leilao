@@ -1,0 +1,111 @@
+<!-- Hero -->
+<section class="relative overflow-hidden py-20 px-4">
+  <div class="absolute inset-0 bg-gradient-to-b from-violet-900/30 via-transparent to-transparent pointer-events-none"></div>
+  <div class="max-w-7xl mx-auto text-center relative">
+    <p class="text-violet-400 font-semibold text-sm tracking-widest uppercase mb-3">Leilão em curso</p>
+    <h1 class="text-5xl sm:text-6xl font-extrabold text-white leading-tight">
+      Arte que<br class="hidden sm:block" />
+      <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-500">transforma</span>
+    </h1>
+    <p class="mt-5 text-zinc-400 text-lg max-w-xl mx-auto">
+      Adquira obras únicas de artistas angolanos. Faça o seu lance e leve arte para casa.
+    </p>
+  </div>
+</section>
+
+<!-- Content -->
+<section class="max-w-7xl mx-auto px-4 pb-20">
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (_ of [1,2,3,4,5,6]; track $index) {
+        <div class="bg-zinc-800/50 rounded-2xl overflow-hidden animate-pulse">
+          <div class="h-56 bg-zinc-700/60"></div>
+          <div class="p-5 space-y-3">
+            <div class="h-4 bg-zinc-700/60 rounded w-3/4"></div>
+            <div class="h-3 bg-zinc-700/60 rounded w-1/2"></div>
+            <div class="h-8 bg-zinc-700/60 rounded mt-4"></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error()) {
+    <div class="flex flex-col items-center justify-center py-24 text-center gap-4">
+      <span class="text-5xl">⚠️</span>
+      <p class="text-red-400 font-semibold text-lg">{{ error() }}</p>
+      <p class="text-zinc-500 text-sm">Execute <code class="bg-zinc-800 px-2 py-0.5 rounded">npm start</code> na pasta <code class="bg-zinc-800 px-2 py-0.5 rounded">leilao-app</code></p>
+    </div>
+  }
+
+  <!-- Grid -->
+  @if (!loading() && !error()) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (artwork of artworks(); track artwork.id) {
+        <a [routerLink]="['/artworks', artwork.id]"
+           class="group bg-zinc-900 border border-white/5 rounded-2xl overflow-hidden
+                  hover:border-violet-500/50 hover:shadow-lg hover:shadow-violet-900/20
+                  transition-all duration-300 flex flex-col cursor-pointer">
+
+          <!-- Image -->
+          <div class="relative overflow-hidden h-56">
+            <img [src]="artwork.image" [alt]="artwork.title"
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                 loading="lazy" />
+            <!-- Badge ativo/encerrado -->
+            @if (artwork.is_active) {
+              <span class="absolute top-3 left-3 bg-emerald-500/90 text-white text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">
+                Activo
+              </span>
+            } @else {
+              <span class="absolute top-3 left-3 bg-zinc-700/90 text-zinc-300 text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">
+                Encerrado
+              </span>
+            }
+            <!-- Total lances -->
+            <span class="absolute top-3 right-3 bg-black/60 text-zinc-300 text-xs px-2.5 py-1 rounded-full backdrop-blur-sm">
+              {{ artwork.total_bids }} lance{{ artwork.total_bids !== 1 ? 's' : '' }}
+            </span>
+          </div>
+
+          <!-- Body -->
+          <div class="p-5 flex flex-col flex-1 gap-3">
+            <div>
+              <h2 class="text-white font-bold text-lg leading-snug group-hover:text-violet-300 transition-colors">
+                {{ artwork.title }}
+              </h2>
+              <p class="text-zinc-500 text-sm">{{ artwork.artist }}</p>
+            </div>
+
+            <p class="text-zinc-400 text-sm line-clamp-2 flex-1">{{ artwork.description }}</p>
+
+            <!-- Price + Countdown -->
+            <div class="border-t border-white/5 pt-3 flex items-end justify-between gap-2">
+              <div>
+                <p class="text-zinc-500 text-xs">Lance actual</p>
+                <p class="text-amber-400 font-bold text-xl">
+                  {{ artwork.current_price | currency:'AOA':'Kz ':'1.0-0' }}
+                </p>
+              </div>
+              <div class="text-right">
+                <p class="text-zinc-500 text-xs mb-1">Termina em</p>
+                <app-countdown [auctionEnd]="artwork.auction_end" />
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="bg-violet-600/10 group-hover:bg-violet-600 border border-violet-500/30 group-hover:border-transparent
+                        text-violet-300 group-hover:text-white text-center text-sm font-semibold
+                        rounded-xl py-2.5 transition-all duration-200">
+              Ver detalhes & Licitar
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+  }
+
+</section>

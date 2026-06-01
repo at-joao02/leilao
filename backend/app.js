@@ -1,0 +1,36 @@
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+const express = require('express');
+const cors    = require('cors');
+const routes       = require('./routes');
+const adminRoutes  = require('./admin.routes');
+
+const app  = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(express.json());
+
+app.use('/api', routes);
+app.use('/admin', adminRoutes);
+
+app.get('/health', (_, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
+
+app.use((_, res) => res.status(404).json({ error: 'Rota não encontrada.' }));
+
+app.use((err, _req, res, _next) => {
+  console.error('[error]', err);
+  res.status(500).json({ error: 'Erro interno do servidor.' });
+});
+
+app.listen(PORT, () => {
+  console.log(`Servidor a correr em http://localhost:${PORT}`);
+  console.log(`  GET    /api/artworks`);
+  console.log(`  GET    /api/artworks/:id`);
+  console.log(`  POST   /api/artworks/:id/bid`);
+  console.log(`  POST   /admin/login`);
+  console.log(`  GET    /admin/artworks`);
+  console.log(`  POST   /admin/artworks`);
+  console.log(`  PUT    /admin/artworks/:id`);
+  console.log(`  DELETE /admin/artworks/:id`);
+  console.log(`  GET    /admin/artworks/:id/bids`);
+});

@@ -1,0 +1,76 @@
+const db = require('./db');
+
+// ── Artworks ──────────────────────────────────────────────────────────────────
+
+const Artwork = {
+  findAll() {
+    return db.prepare(`
+      SELECT
+        a.*,
+        CASE WHEN a.auction_end > datetime('now', 'localtime') THEN 1 ELSE 0 END AS is_active,
+        (SELECT COUNT(*) FROM bids WHERE artwork_id = a.id) AS total_bids
+      FROM artworks a
+      ORDER BY a.auction_end ASC
+    `).all();
+  },
+
+  findById(id) {
+    return db.prepare(`
+      SELECT
+        a.*,
+        CASE WHEN a.auction_end > datetime('now', 'localtime') THEN 1 ELSE 0 END AS is_active,
+        (SELECT COUNT(*) FROM bids WHERE artwork_id = a.id) AS total_bids
+      FROM artworks a
+      WHERE a.id = ?
+    `).get(id);
+  },
+
+  updateCurrentPrice(id, price) {
+    db.prepare('UPDATE artworks SET current_price = ? WHERE id = ?').run(price, id);
+  },
+};
+
+// ── Bidders ───────────────────────────────────────────────────────────────────
+
+const Bidder = {
+  create({ name, email, company, is_anonymous }) {
+    const result = db.prepare(
+      'INSERT INTO bidders (name, email, company, is_anonymous) VALUES (?, ?, ?, ?)'
+    ).run(name, email, company || null, is_anonymous ? 1 : 0);
+    return result.lastInsertRowid;
+  },
+};
+
+// ── Bids ──────────────────────────────────────────────────────────────────────
+
+const Bid = {
+  getLastForArtwork(artwork_id) {
+    return db.prepare(
+      'SELECT * FROM bids WHERE artwork_id = ? ORDER BY amount DESC LIMIT 1'
+    ).get(artwork_id);
+  },
+
+  listForArtwork(artwork_id) {
+    return db.prepare(`
+      SELECT
+        b.id,
+        b.amount,
+        b.created_at,
+        CASE WHEN d.is_anonymous = 1 THEN 'Anónimo' ELSE d.name  END AS bidder_name,
+        CASE WHEN d.is_anonymous = 1 THEN NULL        ELSE d.company END AS company
+      FROM bids b
+      JOIN bidders d ON d.id = b.bidder_id
+      WHERE b.artwork_id = ?
+      ORDER BY b.created_at DESC
+    `).all(artwork_id);
+  },
+
+  create({ artwork_id, bidder_id, amount }) {
+    const result = db.prepare(
+      'INSERT INTO bids (artwork_id, bidder_id, amount) VALUES (?, ?, ?)'
+    ).run(artwork_id, bidder_id, amount);
+    return result.lastInsertRowid;
+  },
+};
+
+module.exports = { Artwork, Bidder, Bid };

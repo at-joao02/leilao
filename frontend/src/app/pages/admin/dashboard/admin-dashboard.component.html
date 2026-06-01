@@ -1,0 +1,397 @@
+<!-- Header -->
+<header class="sticky top-0 z-40 bg-zinc-950/90 backdrop-blur border-b border-white/5">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <a routerLink="/" class="text-zinc-500 hover:text-white transition-colors" title="Ver leilão público">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </a>
+      <span class="text-white font-bold text-base">Painel de Administração</span>
+      <span class="hidden sm:block text-zinc-600 text-sm">/ Leilão de Artes</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <button (click)="openCreate()"
+        class="inline-flex items-center gap-1.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nova Obra
+      </button>
+      <button (click)="logout()" title="Sair"
+        class="text-zinc-500 hover:text-red-400 transition-colors p-1">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+
+  <!-- Stats bar -->
+  @if (!loading() && !loadError()) {
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      @for (stat of [
+        { label: 'Total de Obras',  value: stats().total,    color: 'text-white' },
+        { label: 'Leilões Activos', value: stats().active,   color: 'text-emerald-400' },
+        { label: 'Total de Lances', value: stats().totalBids, color: 'text-violet-400' },
+        { label: 'Maior Lance',     value: (stats().topValue | currency:'AOA':'Kz ':'1.0-0'), color: 'text-amber-400' }
+      ]; track stat.label) {
+        <div class="bg-zinc-900 border border-white/5 rounded-xl px-4 py-3">
+          <p class="text-zinc-500 text-xs font-medium">{{ stat.label }}</p>
+          <p class="font-bold text-xl mt-0.5 {{ stat.color }}">{{ stat.value }}</p>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Loading skeleton -->
+  @if (loading()) {
+    <div class="space-y-2">
+      @for (_ of [1,2,3,4]; track $index) {
+        <div class="h-16 bg-zinc-800/40 rounded-xl animate-pulse"></div>
+      }
+    </div>
+  }
+
+  <!-- Error -->
+  @if (loadError()) {
+    <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-5 text-red-400 text-sm text-center">
+      {{ loadError() }}
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!loading() && !loadError()) {
+    <div class="bg-zinc-900 border border-white/5 rounded-2xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-white/5 text-zinc-500 text-xs font-medium uppercase tracking-wider">
+              <th class="text-left px-4 py-3">Obra</th>
+              <th class="text-left px-4 py-3 hidden sm:table-cell">Artista</th>
+              <th class="text-right px-4 py-3">Lance Actual</th>
+              <th class="text-center px-4 py-3 hidden md:table-cell">Lances</th>
+              <th class="text-center px-4 py-3 hidden lg:table-cell">Fim do Leilão</th>
+              <th class="text-center px-4 py-3">Estado</th>
+              <th class="text-right px-4 py-3">Acções</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            @for (artwork of artworks(); track artwork.id) {
+              <tr class="hover:bg-white/[0.02] transition-colors group">
+                <!-- Obra -->
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    @if (artwork.image) {
+                      <img [src]="artwork.image" [alt]="artwork.title"
+                           class="w-10 h-10 rounded-lg object-cover shrink-0 hidden sm:block" />
+                    } @else {
+                      <div class="w-10 h-10 rounded-lg bg-zinc-800 hidden sm:flex items-center justify-center shrink-0">
+                        <span class="text-lg">🎨</span>
+                      </div>
+                    }
+                    <div>
+                      <p class="text-white font-medium leading-snug">{{ artwork.title }}</p>
+                      <p class="text-zinc-500 text-xs sm:hidden">{{ artwork.artist }}</p>
+                    </div>
+                  </div>
+                </td>
+                <!-- Artista -->
+                <td class="px-4 py-3 text-zinc-400 hidden sm:table-cell">{{ artwork.artist }}</td>
+                <!-- Lance actual -->
+                <td class="px-4 py-3 text-right">
+                  <p class="text-amber-400 font-semibold">{{ artwork.current_price | currency:'AOA':'Kz ':'1.0-0' }}</p>
+                  @if (artwork.starting_price !== artwork.current_price) {
+                    <p class="text-zinc-600 text-xs">base: {{ artwork.starting_price | currency:'AOA':'Kz ':'1.0-0' }}</p>
+                  }
+                </td>
+                <!-- Lances -->
+                <td class="px-4 py-3 text-center hidden md:table-cell">
+                  <button (click)="openBids(artwork)"
+                    class="inline-flex items-center gap-1 text-violet-400 hover:text-violet-300 font-medium transition-colors">
+                    {{ artwork.total_bids }}
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                  </button>
+                </td>
+                <!-- Fim do leilão -->
+                <td class="px-4 py-3 text-center text-zinc-400 text-xs hidden lg:table-cell">
+                  {{ artwork.auction_end | date:'dd/MM/yy HH:mm' }}
+                </td>
+                <!-- Estado -->
+                <td class="px-4 py-3 text-center">
+                  @if (artwork.is_active) {
+                    <span class="inline-block bg-emerald-500/15 text-emerald-400 text-xs font-semibold px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      Activo
+                    </span>
+                  } @else {
+                    <span class="inline-block bg-zinc-800 text-zinc-500 text-xs font-semibold px-2 py-0.5 rounded-full">
+                      Encerrado
+                    </span>
+                  }
+                </td>
+                <!-- Acções -->
+                <td class="px-4 py-3 text-right">
+                  <div class="inline-flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <!-- Ver lances (mobile) -->
+                    <button (click)="openBids(artwork)" title="Ver lances"
+                      class="p-1.5 text-zinc-400 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors md:hidden">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                      </svg>
+                    </button>
+                    <!-- Editar -->
+                    <button (click)="openEdit(artwork)" title="Editar"
+                      class="p-1.5 text-zinc-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                    </button>
+                    <!-- Eliminar -->
+                    <button (click)="openDelete(artwork)" title="Eliminar"
+                      class="p-1.5 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+
+            @if (artworks().length === 0) {
+              <tr>
+                <td colspan="7" class="px-4 py-12 text-center text-zinc-500">
+                  Nenhuma obra cadastrada. <button (click)="openCreate()" class="text-violet-400 hover:underline">Criar a primeira</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- Modal: Create / Edit Artwork                                              -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+@if (showForm()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4" (click)="showForm.set(false)">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
+         (click)="$event.stopPropagation()">
+
+      <!-- Modal header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-white/5 sticky top-0 bg-zinc-900 rounded-t-2xl">
+        <h2 class="text-white font-bold text-lg">
+          {{ formMode() === 'create' ? 'Nova Obra' : 'Editar Obra' }}
+        </h2>
+        <button (click)="showForm.set(false)" class="text-zinc-400 hover:text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal body -->
+      <form (ngSubmit)="submitForm()" class="p-6 space-y-4">
+
+        @if (formError()) {
+          <div class="bg-red-500/15 border border-red-500/30 rounded-lg px-4 py-3 text-red-300 text-sm">
+            {{ formError() }}
+          </div>
+        }
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Título -->
+          <div class="sm:col-span-2">
+            <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Título *</label>
+            <input type="text" required [value]="formData().title"
+              (input)="patchForm('title', $any($event.target).value)"
+              class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
+                     focus:outline-none focus:border-violet-500 transition-colors"
+              placeholder="Nome da obra" />
+          </div>
+          <!-- Artista -->
+          <div class="sm:col-span-2">
+            <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Artista *</label>
+            <input type="text" required [value]="formData().artist"
+              (input)="patchForm('artist', $any($event.target).value)"
+              class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
+                     focus:outline-none focus:border-violet-500 transition-colors"
+              placeholder="Nome do artista" />
+          </div>
+          <!-- Descrição -->
+          <div class="sm:col-span-2">
+            <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Descrição</label>
+            <textarea rows="3" [value]="formData().description"
+              (input)="patchForm('description', $any($event.target).value)"
+              class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
+                     focus:outline-none focus:border-violet-500 transition-colors resize-none"
+              placeholder="Descrição da obra..."></textarea>
+          </div>
+          <!-- Imagem -->
+          <div class="sm:col-span-2">
+            <label class="block text-xs text-zinc-400 mb-1.5 font-medium">URL da Imagem</label>
+            <input type="url" [value]="formData().image"
+              (input)="patchForm('image', $any($event.target).value)"
+              class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
+                     focus:outline-none focus:border-violet-500 transition-colors"
+              placeholder="https://..." />
+          </div>
+          <!-- Preço base -->
+          <div>
+            <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Preço Base (Kz) *</label>
+            <input type="number" required min="1" [value]="formData().starting_price"
+              (input)="patchForm('starting_price', +$any($event.target).value)"
+              class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
+                     focus:outline-none focus:border-violet-500 transition-colors"
+              placeholder="10000" />
+          </div>
+          <!-- Lance actual (só em edição) -->
+          @if (formMode() === 'edit') {
+            <div>
+              <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Lance Actual (Kz)</label>
+              <input type="number" min="1" [value]="formData().current_price"
+                (input)="patchForm('current_price', +$any($event.target).value)"
+                class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
+                       focus:outline-none focus:border-violet-500 transition-colors" />
+            </div>
+          }
+          <!-- Fim do leilão -->
+          <div [class.sm:col-span-2]="formMode() === 'create'">
+            <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Fim do Leilão *</label>
+            <input type="datetime-local" required [value]="formData().auction_end"
+              (input)="patchForm('auction_end', $any($event.target).value)"
+              class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
+                     focus:outline-none focus:border-violet-500 transition-colors [color-scheme:dark]" />
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-3 pt-2">
+          <button type="button" (click)="showForm.set(false)"
+            class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold rounded-xl py-2.5 transition-colors text-sm">
+            Cancelar
+          </button>
+          <button type="submit" [disabled]="formLoading()"
+            class="flex-1 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-700 disabled:cursor-not-allowed
+                   text-white font-semibold rounded-xl py-2.5 transition-colors text-sm">
+            @if (formLoading()) { A guardar... } @else { Guardar }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- Modal: Bids                                                               -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+@if (showBids()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4" (click)="showBids.set(false)">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl max-h-[80vh] flex flex-col"
+         (click)="$event.stopPropagation()">
+
+      <div class="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
+        <div>
+          <h2 class="text-white font-bold text-lg">Lances</h2>
+          <p class="text-zinc-500 text-xs mt-0.5">{{ bidsTitle() }}</p>
+        </div>
+        <button (click)="showBids.set(false)" class="text-zinc-400 hover:text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="overflow-y-auto flex-1 p-4">
+        @if (bidsLoading()) {
+          <div class="space-y-2">
+            @for (_ of [1,2,3]; track $index) {
+              <div class="h-14 bg-zinc-800/50 rounded-xl animate-pulse"></div>
+            }
+          </div>
+        } @else if (bids().length === 0) {
+          <p class="text-center text-zinc-500 py-8 text-sm">Ainda não há lances para esta obra.</p>
+        } @else {
+          <div class="space-y-2">
+            @for (bid of bids(); track bid.id; let i = $index) {
+              <div class="bg-zinc-800/60 border border-white/5 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-7 h-7 rounded-full bg-violet-600/20 border border-violet-500/30 flex items-center justify-center shrink-0">
+                    <span class="text-violet-400 text-xs font-bold">{{ i + 1 }}</span>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-white text-sm font-medium truncate">
+                      {{ bid.is_anonymous ? 'Anónimo' : bid.name }}
+                      @if (bid.is_anonymous) {
+                        <span class="ml-1 text-zinc-600 text-xs font-normal">({{ bid.email }})</span>
+                      }
+                    </p>
+                    @if (!bid.is_anonymous && bid.company) {
+                      <p class="text-zinc-500 text-xs truncate">{{ bid.company }}</p>
+                    }
+                    <p class="text-zinc-600 text-xs">{{ bid.created_at | date:'dd/MM/yyyy HH:mm:ss' }}</p>
+                  </div>
+                </div>
+                <p class="text-amber-400 font-bold text-sm shrink-0">
+                  {{ bid.amount | currency:'AOA':'Kz ':'1.0-0' }}
+                </p>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- Modal: Confirm Delete                                                     -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+@if (showDelete() && deletingArtwork()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4" (click)="showDelete.set(false)">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-sm bg-zinc-900 border border-white/10 rounded-2xl p-6 shadow-2xl"
+         (click)="$event.stopPropagation()">
+
+      <div class="w-12 h-12 rounded-full bg-red-500/15 border border-red-500/30 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+      </div>
+
+      <h3 class="text-white font-bold text-lg text-center">Eliminar Obra</h3>
+      <p class="text-zinc-400 text-sm text-center mt-2 mb-6">
+        Tem a certeza que quer eliminar
+        <span class="text-white font-medium">"{{ deletingArtwork()!.title }}"</span>?
+        Esta acção também remove todos os lances associados e não pode ser desfeita.
+      </p>
+
+      <div class="flex gap-3">
+        <button (click)="showDelete.set(false)"
+          class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold rounded-xl py-2.5 transition-colors text-sm">
+          Cancelar
+        </button>
+        <button (click)="confirmDelete()" [disabled]="deleteLoading()"
+          class="flex-1 bg-red-600 hover:bg-red-500 disabled:bg-zinc-700 disabled:cursor-not-allowed
+                 text-white font-semibold rounded-xl py-2.5 transition-colors text-sm">
+          @if (deleteLoading()) { A eliminar... } @else { Eliminar }
+        </button>
+      </div>
+    </div>
+  </div>
+}
