@@ -4,13 +4,14 @@ import { Observable } from 'rxjs';
 import {
   AdminArtwork, AdminBidsResponse, ArtworkPayload, Artwork,
 } from '../models/auction.models';
+import { environment } from '../../environments/environment';
 
 const STORAGE_KEY = 'admin_pwd';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private http = inject(HttpClient);
-  private base = 'http://localhost:3000/admin';
+  private base = `${environment.apiBase}/admin`;
 
   // ── Auth ────────────────────────────────────────────────────────────────────
 
