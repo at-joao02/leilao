@@ -311,11 +311,32 @@
           <!-- Artista -->
           <div class="sm:col-span-2">
             <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Artista *</label>
-            <input type="text" required [value]="formData().artist"
-              (input)="patchForm('artist', $any($event.target).value)"
-              class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
-                     focus:outline-none focus:border-violet-500 transition-colors"
-              placeholder="Nome do artista" />
+            @if (artists().length > 0) {
+              <select required
+                (change)="patchForm('artist', $any($event.target).value)"
+                class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
+                       focus:outline-none focus:border-violet-500 transition-colors [color-scheme:dark]">
+                <option value="" disabled [selected]="!formData().artist">Seleccione o artista</option>
+                @if (formData().artist && !artistExists(formData().artist)) {
+                  <option [value]="formData().artist" selected disabled>
+                    {{ formData().artist }} (não cadastrado — seleccione outro)
+                  </option>
+                }
+                @for (artist of artists(); track artist.id) {
+                  <option [value]="artist.name" [selected]="formData().artist === artist.name">
+                    {{ artist.name }}
+                  </option>
+                }
+              </select>
+            } @else {
+              <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 text-amber-300 text-sm">
+                Ainda não há artistas cadastrados. Adicione primeiro o artista.
+                <button type="button" (click)="showForm.set(false); openCreateArtist()"
+                  class="text-violet-400 hover:underline font-semibold ml-1">
+                  Criar artista
+                </button>
+              </div>
+            }
           </div>
           <!-- Descrição -->
           <div class="sm:col-span-2">

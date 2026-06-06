@@ -218,6 +218,10 @@ export class AdminDashboardComponent implements OnInit {
     this.artistFormData.update(d => ({ ...d, [field]: value }));
   }
 
+  artistExists(name: string): boolean {
+    return this.artists().some(a => a.name === name);
+  }
+
   // ── Helpers ──────────────────────────────────────────────────────────────────
 
   patchForm(field: keyof ArtworkPayload, value: string | number) {

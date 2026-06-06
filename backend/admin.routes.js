@@ -78,6 +78,10 @@ router.post('/artworks', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'starting_price deve ser um número positivo.' });
   }
 
+  if (!Artist.findByName(artist.trim())) {
+    return res.status(400).json({ error: 'Artista não existe. Adicione primeiro o artista.' });
+  }
+
   const result = db.prepare(`
     INSERT INTO artworks (title, artist, description, image, starting_price, current_price, auction_end)
     VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -101,6 +105,11 @@ router.put('/artworks/:id', requireAdmin, (req, res) => {
   if (!artwork) return res.status(404).json({ error: 'Obra não encontrada.' });
 
   const { title, artist, description, image, starting_price, current_price, auction_end } = req.body;
+
+  const newArtist = (artist ?? artwork.artist).trim();
+  if (!Artist.findByName(newArtist)) {
+    return res.status(400).json({ error: 'Artista não existe. Adicione primeiro o artista.' });
+  }
 
   const sp = Number(starting_price ?? artwork.starting_price);
   const cp = Number(current_price  ?? artwork.current_price);
