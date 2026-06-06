@@ -66,39 +66,9 @@
 
   @if (!loading() && !error()) {
 
-    <!-- Pesquisa e filtros -->
-    <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-      <div class="relative w-full md:w-80">
-        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-          </svg>
-        </span>
-        <input
-          type="text"
-          [value]="searchQuery()"
-          (input)="searchQuery.set($any($event.target).value)"
-          placeholder="Pesquisar obras, artistas..."
-          class="w-full bg-[#001220]/70 border border-[#0c82cd]/20 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400/50 transition-all" />
-      </div>
-
-      <div class="flex items-center gap-1.5 bg-[#001220]/70 border border-[#0c82cd]/20 p-1.5 rounded-2xl select-none overflow-x-auto max-w-full">
-        @for (artist of artists(); track artist) {
-          <button
-            (click)="selectedArtist.set(artist)"
-            [class]="'px-4 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ' +
-              (selectedArtist() === artist
-                ? 'bg-[#0c82cd] text-white shadow-md font-bold'
-                : 'text-slate-400 hover:text-white')">
-            {{ artist === 'All' ? 'Todos Artistas' : artist }}
-          </button>
-        }
-      </div>
-    </div>
-
     <!-- Grelha de obras -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      @for (artwork of filtered(); track artwork.id) {
+      @for (artwork of artworks(); track artwork.id) {
         <div class="flex flex-col bg-[#012845] border-2 border-[#013457]/50 hover:border-sky-400/35 rounded-3xl overflow-hidden transition-all duration-300 shadow-xl group">
 
           <!-- Imagem com badges -->
@@ -167,9 +137,9 @@
         </div>
       }
 
-      @if (filtered().length === 0) {
+      @if (artworks().length === 0) {
         <div class="col-span-1 md:col-span-2 text-center py-20 bg-[#012845]/50 border border-sky-400/10 rounded-3xl">
-          <span class="text-slate-400 text-sm block">Não foram encontradas obras com estes filtros de pesquisa.</span>
+          <span class="text-slate-400 text-sm block">Ainda não existem obras disponíveis.</span>
         </div>
       }
     </div>

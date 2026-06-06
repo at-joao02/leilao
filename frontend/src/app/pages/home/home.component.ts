@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CurrencyPipe } from '@angular/common';
 import { AuctionService } from '../../services/auction.service';
@@ -18,25 +18,7 @@ export class HomeComponent implements OnInit {
   loading = signal(true);
   error = signal('');
 
-  searchQuery = signal('');
-  selectedArtist = signal('All');
-
   asset = resolveAsset;
-
-  artists = computed(() => ['All', ...new Set(this.artworks().map(a => a.artist))]);
-
-  filtered = computed(() => {
-    const q = this.searchQuery().trim().toLowerCase();
-    const artist = this.selectedArtist();
-    return this.artworks().filter(a => {
-      const matchesSearch = !q
-        || a.title.toLowerCase().includes(q)
-        || a.description.toLowerCase().includes(q)
-        || a.artist.toLowerCase().includes(q);
-      const matchesArtist = artist === 'All' || a.artist === artist;
-      return matchesSearch && matchesArtist;
-    });
-  });
 
   ngOnInit() {
     this.auctionSvc.getArtworks().subscribe({
