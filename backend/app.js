@@ -11,7 +11,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api', routes);
-app.use('/admin', adminRoutes);
+app.use('/api/admin', adminRoutes); // API de admin sob /api para o proxy do Nginx
+app.use('/admin', adminRoutes);     // compatibilidade com chamadas antigas
 
 app.get('/health', (_, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 

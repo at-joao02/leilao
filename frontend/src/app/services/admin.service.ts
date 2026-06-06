@@ -11,7 +11,7 @@ const STORAGE_KEY = 'admin_pwd';
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private http = inject(HttpClient);
-  private base = `${environment.apiBase}/admin`;
+  private base = `${environment.apiBase}/api/admin`;
 
   // ── Auth ────────────────────────────────────────────────────────────────────
 
