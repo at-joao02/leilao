@@ -35,10 +35,12 @@ router.get('/artworks/:id', (req, res) => {
   if (!artwork) return res.status(404).json({ error: 'Obra não encontrada.' });
 
   const bids = Bid.listForArtwork(artwork.id);
+  const artists = Artwork.listArtists(artwork.id);
 
   res.json({
     ...artwork,
     countdown: buildCountdown(artwork.auction_end),
+    artists,
     bids,
   });
 });

@@ -51,6 +51,29 @@ db.exec(`
     amount     REAL    NOT NULL,
     created_at TEXT    NOT NULL DEFAULT (datetime('now', 'localtime'))
   );
+
+  CREATE TABLE IF NOT EXISTS artwork_artists (
+    artwork_id INTEGER NOT NULL REFERENCES artworks(id),
+    artist_id  INTEGER NOT NULL REFERENCES artists(id),
+    PRIMARY KEY (artwork_id, artist_id)
+  );
+`);
+
+// ── Migrações ─────────────────────────────────────────────────────────────────
+
+// Coluna dimensions (tamanho da obra, opcional)
+const artworkCols = db.prepare('PRAGMA table_info(artworks)').all();
+if (!artworkCols.some(c => c.name === 'dimensions')) {
+  db.exec('ALTER TABLE artworks ADD COLUMN dimensions TEXT');
+}
+
+// Backfill: liga obras existentes aos artistas pelo nome
+db.exec(`
+  INSERT OR IGNORE INTO artwork_artists (artwork_id, artist_id)
+  SELECT a.id, ar.id
+  FROM artworks a
+  JOIN artists ar ON ar.name = a.artist COLLATE NOCASE
+  WHERE NOT EXISTS (SELECT 1 FROM artwork_artists x WHERE x.artwork_id = a.id)
 `);
 
 module.exports = db;

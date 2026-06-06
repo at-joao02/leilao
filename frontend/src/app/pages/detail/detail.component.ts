@@ -5,7 +5,8 @@ import { AuctionService } from '../../services/auction.service';
 import { CountdownComponent } from '../../components/countdown/countdown.component';
 import { BidModalComponent } from '../../components/bid-modal/bid-modal.component';
 import { ArtistModalComponent } from '../../components/artist-modal/artist-modal.component';
-import { ArtworkDetail } from '../../models/auction.models';
+import { ArtworkDetail, ArtworkArtist } from '../../models/auction.models';
+import { resolveAsset } from '../../utils/assets';
 
 const MIN_INCREMENT = 500;
 
@@ -22,7 +23,17 @@ export class DetailComponent implements OnInit {
   loading = signal(true);
   error = signal('');
   showModal = signal(false);
-  showArtistModal = signal(false);
+  artistModalName = signal<string | null>(null);
+
+  asset = resolveAsset;
+
+  /** Lista de artistas da obra (fallback para o campo de texto antigo) */
+  artistList = computed<ArtworkArtist[]>(() => {
+    const a = this.artwork();
+    if (!a) return [];
+    if (a.artists?.length) return a.artists;
+    return a.artist ? [{ id: 0, name: a.artist }] : [];
+  });
 
   minBid = computed(() => {
     const a = this.artwork();

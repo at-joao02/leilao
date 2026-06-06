@@ -4,6 +4,7 @@ import { CurrencyPipe } from '@angular/common';
 import { AuctionService } from '../../services/auction.service';
 import { CountdownComponent } from '../../components/countdown/countdown.component';
 import { Artwork } from '../../models/auction.models';
+import { resolveAsset } from '../../utils/assets';
 
 @Component({
   selector: 'app-home',
@@ -19,6 +20,8 @@ export class HomeComponent implements OnInit {
 
   searchQuery = signal('');
   selectedArtist = signal('All');
+
+  asset = resolveAsset;
 
   artists = computed(() => ['All', ...new Set(this.artworks().map(a => a.artist))]);
 

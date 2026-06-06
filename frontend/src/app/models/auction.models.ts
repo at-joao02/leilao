@@ -13,9 +13,15 @@ export interface Artwork {
   starting_price: number;
   current_price: number;
   auction_end: string;
+  dimensions?: string | null;
   is_active: 0 | 1;
   total_bids: number;
   countdown: Countdown;
+}
+
+export interface ArtworkArtist {
+  id: number;
+  name: string;
 }
 
 export interface ArtistRecord {
@@ -42,6 +48,7 @@ export interface Bid {
 }
 
 export interface ArtworkDetail extends Artwork {
+  artists: ArtworkArtist[];
   bids: Bid[];
 }
 
@@ -63,6 +70,7 @@ export interface BidResponse {
 
 export interface AdminArtwork extends Artwork {
   top_bid: number | null;
+  artist_ids: number[];
 }
 
 export interface AdminBid {
@@ -82,9 +90,12 @@ export interface AdminBidsResponse {
 
 export interface ArtworkPayload {
   title: string;
-  artist: string;
+  artist_ids: number[];
   description: string;
   image: string;
+  /** Data URL base64 da nova imagem a carregar */
+  image_data?: string;
+  dimensions?: string;
   starting_price: number;
   current_price?: number;
   auction_end: string;

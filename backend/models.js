@@ -65,6 +65,16 @@ const Artwork = {
   updateCurrentPrice(id, price) {
     db.prepare('UPDATE artworks SET current_price = ? WHERE id = ?').run(price, id);
   },
+
+  listArtists(id) {
+    return db.prepare(`
+      SELECT ar.id, ar.name
+      FROM artwork_artists aa
+      JOIN artists ar ON ar.id = aa.artist_id
+      WHERE aa.artwork_id = ?
+      ORDER BY ar.name ASC
+    `).all(id);
+  },
 };
 
 // ── Artists ───────────────────────────────────────────────────────────────────

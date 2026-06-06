@@ -3,14 +3,14 @@ import { Router, RouterLink } from '@angular/router';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../services/admin.service';
-import { environment } from '../../../../environments/environment';
+import { resolveAsset } from '../../../utils/assets';
 import { AdminArtwork, AdminBid, ArtworkPayload, ArtistRecord, ArtistPayload } from '../../../models/auction.models';
 
 type ModalMode = 'create' | 'edit';
 
 const EMPTY_FORM = (): ArtworkPayload => ({
-  title: '', artist: '', description: '', image: '',
-  starting_price: 0, auction_end: '',
+  title: '', artist_ids: [], description: '', image: '', image_data: '',
+  dimensions: '', starting_price: 0, auction_end: '',
 });
 
 const EMPTY_ARTIST_FORM = (): ArtistPayload => ({ name: '', photo: '', bio: '' });
@@ -103,8 +103,9 @@ export class AdminDashboardComponent implements OnInit {
     // Convert "YYYY-MM-DD HH:MM:SS" → "YYYY-MM-DDTHH:MM" for datetime-local input
     const dt = a.auction_end.replace(' ', 'T').substring(0, 16);
     this.formData.set({
-      title: a.title, artist: a.artist, description: a.description ?? '',
-      image: a.image ?? '', starting_price: a.starting_price,
+      title: a.title, artist_ids: a.artist_ids ?? [], description: a.description ?? '',
+      image: a.image ?? '', image_data: '', dimensions: a.dimensions ?? '',
+      starting_price: a.starting_price,
       current_price: a.current_price, auction_end: dt,
     });
     this.showForm.set(true);
@@ -113,8 +114,12 @@ export class AdminDashboardComponent implements OnInit {
   submitForm() {
     this.formError.set('');
     const d = this.formData();
-    if (!d.title.trim() || !d.artist.trim() || !d.starting_price || !d.auction_end) {
+    if (!d.title.trim() || !d.starting_price || !d.auction_end) {
       this.formError.set('Preencha todos os campos obrigatórios.');
+      return;
+    }
+    if (d.artist_ids.length === 0) {
+      this.formError.set('Seleccione pelo menos um artista.');
       return;
     }
     // Convert datetime-local "YYYY-MM-DDTHH:MM" → "YYYY-MM-DD HH:MM:00"
@@ -219,10 +224,6 @@ export class AdminDashboardComponent implements OnInit {
     this.artistFormData.update(d => ({ ...d, [field]: value }));
   }
 
-  artistExists(name: string): boolean {
-    return this.artists().some(a => a.name === name);
-  }
-
   onArtistPhotoSelected(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
@@ -232,14 +233,35 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   /** Caminhos locais (/api/uploads/...) precisam do apiBase em dev */
-  resolvePhoto(photo: string | null | undefined): string {
-    if (!photo) return '';
-    return photo.startsWith('/') ? environment.apiBase + photo : photo;
-  }
+  resolvePhoto = resolveAsset;
 
   artistPhotoPreview(): string {
     const d = this.artistFormData();
     return d.photo_data || this.resolvePhoto(d.photo);
+  }
+
+  // ── Obra: artistas e imagem ──────────────────────────────────────────────────
+
+  toggleArtist(id: number) {
+    this.formData.update(d => ({
+      ...d,
+      artist_ids: d.artist_ids.includes(id)
+        ? d.artist_ids.filter(x => x !== id)
+        : [...d.artist_ids, id],
+    }));
+  }
+
+  onArtworkImageSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => this.formData.update(d => ({ ...d, image_data: reader.result as string }));
+    reader.readAsDataURL(file);
+  }
+
+  artworkImagePreview(): string {
+    const d = this.formData();
+    return d.image_data || this.resolvePhoto(d.image);
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────────

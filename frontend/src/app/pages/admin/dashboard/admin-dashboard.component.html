@@ -87,7 +87,7 @@
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-3">
                     @if (artwork.image) {
-                      <img [src]="artwork.image" [alt]="artwork.title"
+                      <img [src]="resolvePhoto(artwork.image)" [alt]="artwork.title"
                            class="w-10 h-10 rounded-lg object-cover shrink-0 hidden sm:block" />
                     } @else {
                       <div class="w-10 h-10 rounded-lg bg-zinc-800 hidden sm:flex items-center justify-center shrink-0">
@@ -308,26 +308,22 @@
                      focus:outline-none focus:border-violet-500 transition-colors"
               placeholder="Nome da obra" />
           </div>
-          <!-- Artista -->
+          <!-- Artistas (um ou mais) -->
           <div class="sm:col-span-2">
-            <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Artista *</label>
+            <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Artistas *</label>
             @if (artists().length > 0) {
-              <select required
-                (change)="patchForm('artist', $any($event.target).value)"
-                class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
-                       focus:outline-none focus:border-violet-500 transition-colors [color-scheme:dark]">
-                <option value="" disabled [selected]="!formData().artist">Seleccione o artista</option>
-                @if (formData().artist && !artistExists(formData().artist)) {
-                  <option [value]="formData().artist" selected disabled>
-                    {{ formData().artist }} (não cadastrado — seleccione outro)
-                  </option>
-                }
+              <div class="bg-zinc-800 border border-white/10 rounded-xl p-3 max-h-36 overflow-y-auto space-y-1.5">
                 @for (artist of artists(); track artist.id) {
-                  <option [value]="artist.name" [selected]="formData().artist === artist.name">
+                  <label class="flex items-center gap-2.5 cursor-pointer text-sm text-zinc-300 hover:text-white transition-colors">
+                    <input type="checkbox"
+                      [checked]="formData().artist_ids.includes(artist.id)"
+                      (change)="toggleArtist(artist.id)"
+                      class="w-4 h-4 accent-violet-600 shrink-0" />
                     {{ artist.name }}
-                  </option>
+                  </label>
                 }
-              </select>
+              </div>
+              <p class="text-zinc-600 text-[11px] mt-1">Seleccione um ou mais artistas.</p>
             } @else {
               <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 text-amber-300 text-sm">
                 Ainda não há artistas cadastrados. Adicione primeiro o artista.
@@ -349,12 +345,36 @@
           </div>
           <!-- Imagem -->
           <div class="sm:col-span-2">
-            <label class="block text-xs text-zinc-400 mb-1.5 font-medium">URL da Imagem</label>
-            <input type="url" [value]="formData().image"
-              (input)="patchForm('image', $any($event.target).value)"
+            <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Imagem da Obra</label>
+            <div class="flex items-center gap-4">
+              @if (artworkImagePreview()) {
+                <img [src]="artworkImagePreview()" alt="Pré-visualização"
+                     class="w-20 h-16 rounded-lg object-cover border border-white/10 shrink-0" />
+              } @else {
+                <div class="w-20 h-16 rounded-lg bg-zinc-800 border border-white/10 flex items-center justify-center shrink-0">
+                  <span class="text-zinc-600 text-xl">🖼️</span>
+                </div>
+              }
+              <div class="flex-1">
+                <input type="file" accept="image/jpeg,image/png,image/webp"
+                  (change)="onArtworkImageSelected($event)"
+                  class="w-full text-xs text-zinc-400
+                         file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0
+                         file:bg-violet-600 file:text-white file:text-xs file:font-semibold
+                         file:cursor-pointer hover:file:bg-violet-500 file:transition-colors" />
+                <p class="text-zinc-600 text-[11px] mt-1">JPEG, PNG ou WebP — máx. 5 MB. Guardada no servidor.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dimensões (opcional) -->
+          <div class="sm:col-span-2">
+            <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Tamanho da Obra <span class="text-zinc-600">(opcional)</span></label>
+            <input type="text" [value]="formData().dimensions"
+              (input)="patchForm('dimensions', $any($event.target).value)"
               class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
                      focus:outline-none focus:border-violet-500 transition-colors"
-              placeholder="https://..." />
+              placeholder="Ex: 120cm x 80cm" />
           </div>
           <!-- Preço base -->
           <div>
