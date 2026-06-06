@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../services/admin.service';
+import { environment } from '../../../../environments/environment';
 import { AdminArtwork, AdminBid, ArtworkPayload, ArtistRecord, ArtistPayload } from '../../../models/auction.models';
 
 type ModalMode = 'create' | 'edit';
@@ -220,6 +221,25 @@ export class AdminDashboardComponent implements OnInit {
 
   artistExists(name: string): boolean {
     return this.artists().some(a => a.name === name);
+  }
+
+  onArtistPhotoSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => this.patchArtistForm('photo_data', reader.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  /** Caminhos locais (/api/uploads/...) precisam do apiBase em dev */
+  resolvePhoto(photo: string | null | undefined): string {
+    if (!photo) return '';
+    return photo.startsWith('/') ? environment.apiBase + photo : photo;
+  }
+
+  artistPhotoPreview(): string {
+    const d = this.artistFormData();
+    return d.photo_data || this.resolvePhoto(d.photo);
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────────

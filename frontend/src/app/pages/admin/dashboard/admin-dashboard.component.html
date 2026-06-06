@@ -216,7 +216,7 @@
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-3">
                     @if (artist.photo) {
-                      <img [src]="artist.photo" [alt]="artist.name"
+                      <img [src]="resolvePhoto(artist.photo)" [alt]="artist.name"
                            class="w-10 h-10 rounded-full object-cover shrink-0" />
                     } @else {
                       <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center shrink-0">
@@ -546,16 +546,26 @@
 
         <!-- Fotografia -->
         <div>
-          <label class="block text-xs text-zinc-400 mb-1.5 font-medium">URL da Fotografia</label>
-          <input type="url" [value]="artistFormData().photo"
-            (input)="patchArtistForm('photo', $any($event.target).value)"
-            class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
-                   focus:outline-none focus:border-violet-500 transition-colors"
-            placeholder="https://..." />
-          @if (artistFormData().photo) {
-            <img [src]="artistFormData().photo" alt="Pré-visualização"
-                 class="mt-2 w-16 h-16 rounded-full object-cover border border-white/10" />
-          }
+          <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Fotografia</label>
+          <div class="flex items-center gap-4">
+            @if (artistPhotoPreview()) {
+              <img [src]="artistPhotoPreview()" alt="Pré-visualização"
+                   class="w-16 h-16 rounded-full object-cover border border-white/10 shrink-0" />
+            } @else {
+              <div class="w-16 h-16 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center shrink-0">
+                <span class="text-zinc-600 text-xl">📷</span>
+              </div>
+            }
+            <div class="flex-1">
+              <input type="file" accept="image/jpeg,image/png,image/webp"
+                (change)="onArtistPhotoSelected($event)"
+                class="w-full text-xs text-zinc-400
+                       file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0
+                       file:bg-violet-600 file:text-white file:text-xs file:font-semibold
+                       file:cursor-pointer hover:file:bg-violet-500 file:transition-colors" />
+              <p class="text-zinc-600 text-[11px] mt-1">JPEG, PNG ou WebP — máx. 5 MB. Guardada no servidor.</p>
+            </div>
+          </div>
         </div>
 
         <!-- Biografia -->

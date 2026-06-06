@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, signal, inject } from '@angular/core';
 import { AuctionService } from '../../services/auction.service';
 import { ARTISTS, DEFAULT_BIO, ArtistInfo } from '../../data/artists.data';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-artist-modal',
@@ -99,9 +100,11 @@ export class ArtistModalComponent implements OnInit {
     // Dados geridos pelo admin (BD) têm prioridade
     this.auctionSvc.getArtist(this.artistName).subscribe({
       next: (a) => {
+        const photo = a.photo ?? '';
         this.artist.set({
           name: a.name,
-          photo: a.photo ?? '',
+          // Caminhos locais (/api/uploads/...) precisam do apiBase em dev
+          photo: photo.startsWith('/') ? environment.apiBase + photo : photo,
           bio: a.bio?.trim() || DEFAULT_BIO,
         });
         this.loading.set(false);

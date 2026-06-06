@@ -29,6 +29,8 @@ export interface ArtistPayload {
   name: string;
   photo?: string;
   bio?: string;
+  /** Data URL base64 da nova fotografia a carregar */
+  photo_data?: string;
 }
 
 export interface Bid {

@@ -1,7 +1,40 @@
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 const { Router } = require('express');
+const fs = require('fs');
+const path = require('path');
 const db = require('./db');
 const { Artwork, Artist, User } = require('./models');
+
+const UPLOADS_DIR = path.join(__dirname, '..', 'uploads', 'artists');
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+
+/**
+ * Guarda uma fotografia enviada como data URL base64 e devolve o caminho público.
+ * Devolve null se não houver dados; lança Error em formato/tamanho inválido.
+ */
+function saveArtistPhoto(id, dataUrl) {
+  if (!dataUrl) return null;
+  const m = /^data:image\/(jpeg|jpg|png|webp);base64,(.+)$/.exec(dataUrl);
+  if (!m) throw new Error('Formato de imagem inválido (use JPEG, PNG ou WebP).');
+
+  const buf = Buffer.from(m[2], 'base64');
+  if (buf.length > MAX_PHOTO_BYTES) throw new Error('Imagem demasiado grande (máx. 5 MB).');
+
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  removeArtistPhoto(id);
+
+  const ext = m[1] === 'jpeg' ? 'jpg' : m[1];
+  const file = `artist-${id}.${ext}`;
+  fs.writeFileSync(path.join(UPLOADS_DIR, file), buf);
+  return `/api/uploads/artists/${file}`;
+}
+
+function removeArtistPhoto(id) {
+  if (!fs.existsSync(UPLOADS_DIR)) return;
+  for (const f of fs.readdirSync(UPLOADS_DIR)) {
+    if (f.startsWith(`artist-${id}.`)) fs.unlinkSync(path.join(UPLOADS_DIR, f));
+  }
+}
 
 const router = Router();
 
@@ -161,7 +194,7 @@ router.get('/artists', requireAdmin, (req, res) => {
 // ── POST /admin/artists ───────────────────────────────────────────────────────
 
 router.post('/artists', requireAdmin, (req, res) => {
-  const { name, photo, bio } = req.body;
+  const { name, photo, bio, photo_data } = req.body;
 
   if (!name?.trim()) {
     return res.status(400).json({ error: 'Campo obrigatório: name.' });
@@ -171,6 +204,16 @@ router.post('/artists', requireAdmin, (req, res) => {
   }
 
   const id = Artist.create({ name: name.trim(), photo: photo?.trim(), bio: bio?.trim() });
+
+  if (photo_data) {
+    try {
+      const saved = saveArtistPhoto(id, photo_data);
+      Artist.update(id, { name: name.trim(), photo: saved, bio: bio?.trim() });
+    } catch (e) {
+      return res.status(400).json({ error: e.message });
+    }
+  }
+
   res.status(201).json(Artist.findById(id));
 });
 
@@ -180,7 +223,7 @@ router.put('/artists/:id', requireAdmin, (req, res) => {
   const artist = Artist.findById(req.params.id);
   if (!artist) return res.status(404).json({ error: 'Artista não encontrado.' });
 
-  const { name, photo, bio } = req.body;
+  const { name, photo, bio, photo_data } = req.body;
   const newName = (name ?? artist.name).trim();
 
   const conflict = Artist.findByName(newName);
@@ -188,9 +231,18 @@ router.put('/artists/:id', requireAdmin, (req, res) => {
     return res.status(409).json({ error: 'Já existe um artista com esse nome.' });
   }
 
+  let newPhoto = (photo ?? artist.photo ?? '').trim();
+  if (photo_data) {
+    try {
+      newPhoto = saveArtistPhoto(artist.id, photo_data);
+    } catch (e) {
+      return res.status(400).json({ error: e.message });
+    }
+  }
+
   Artist.update(artist.id, {
     name:  newName,
-    photo: (photo ?? artist.photo ?? '').trim(),
+    photo: newPhoto,
     bio:   (bio ?? artist.bio ?? '').trim(),
   });
 
@@ -203,6 +255,7 @@ router.delete('/artists/:id', requireAdmin, (req, res) => {
   const artist = Artist.findById(req.params.id);
   if (!artist) return res.status(404).json({ error: 'Artista não encontrado.' });
 
+  removeArtistPhoto(artist.id);
   Artist.delete(artist.id);
   res.json({ message: 'Artista eliminado.' });
 });

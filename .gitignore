@@ -17,3 +17,6 @@ frontend/.angular/
 # Logs
 *.log
 npm-debug.log*
+
+# Uploads (fotografias de artistas)
+uploads/
