@@ -11,30 +11,30 @@ import { BidPayload } from '../../models/auction.models';
     <!-- Backdrop -->
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
          (click)="onBackdropClick($event)">
-      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-md"></div>
 
       <!-- Modal -->
-      <div class="relative w-full max-w-md bg-zinc-900 border border-white/10 rounded-2xl p-6 shadow-2xl"
+      <div class="relative w-full max-w-md bg-[#012845] border border-[#0c82cd]/30 rounded-3xl p-6 shadow-2xl"
            (click)="$event.stopPropagation()">
 
         <button (click)="close.emit()" aria-label="Fechar"
-          class="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors">
+          class="absolute top-4 right-4 bg-[#001220]/80 text-sky-400 hover:text-white hover:bg-rose-500/20 p-2 rounded-full transition-all">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
 
         <h2 class="text-xl font-bold text-white mb-1">Fazer Lance</h2>
-        <p class="text-sm text-zinc-400 mb-5">
+        <p class="text-sm text-slate-400 mb-5">
           {{ artworkTitle }} — Lance mínimo:
-          <span class="text-amber-400 font-semibold">{{ minBid | currency:'AOA':'Kz ':'1.0-0' }}</span>
+          <span class="text-[#d99f2a] font-semibold">{{ minBid | currency:'AOA':'Kz ':'1.0-0' }}</span>
         </p>
 
         @if (success()) {
           <div class="bg-emerald-500/20 border border-emerald-500/40 rounded-lg p-4 text-center">
             <p class="text-emerald-400 font-semibold text-lg">Lance registado!</p>
             @if (!payload.is_anonymous) {
-              <p class="text-zinc-300 text-sm mt-1">Verifique o seu email para confirmação.</p>
+              <p class="text-slate-300 text-sm mt-1">Verifique o seu email para confirmação.</p>
             }
           </div>
         } @else {
@@ -53,21 +53,21 @@ import { BidPayload } from '../../models/auction.models';
                 <input type="checkbox" class="sr-only peer"
                   [(ngModel)]="payload.is_anonymous" name="is_anonymous"
                   (ngModelChange)="onAnonymousChange($event)" />
-                <div class="w-10 h-5 bg-zinc-700 rounded-full peer-checked:bg-violet-600 transition-colors"></div>
+                <div class="w-10 h-5 bg-[#001220] border border-sky-500/30 rounded-full peer-checked:bg-sky-500 transition-colors"></div>
                 <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
               </div>
-              <span class="text-sm text-zinc-300">Lance anónimo</span>
+              <span class="text-sm text-slate-300">Lance anónimo</span>
             </label>
 
             <!-- Campos de identidade — ocultados quando anónimo -->
             @if (!payload.is_anonymous) {
               <!-- Nome -->
               <div>
-                <label class="block text-sm text-zinc-400 mb-1.5">Nome *</label>
+                <label class="block text-sm text-slate-400 mb-1.5">Nome *</label>
                 <input type="text" name="name" required
                   [(ngModel)]="payload.name" #nameInput="ngModel"
-                  class="w-full bg-zinc-800 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm
-                         focus:outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
+                  class="w-full bg-[#001220] border border-sky-500/20 rounded-lg px-3 py-2.5 text-white text-sm
+                         focus:outline-none focus:border-sky-400/60 transition-colors placeholder:text-slate-500"
                   placeholder="O seu nome" />
                 @if (nameInput.invalid && nameInput.touched) {
                   <p class="text-red-400 text-xs mt-1">Nome obrigatório.</p>
@@ -76,11 +76,11 @@ import { BidPayload } from '../../models/auction.models';
 
               <!-- Email -->
               <div>
-                <label class="block text-sm text-zinc-400 mb-1.5">Email *</label>
+                <label class="block text-sm text-slate-400 mb-1.5">Email *</label>
                 <input type="email" name="email" required email
                   [(ngModel)]="payload.email" #emailInput="ngModel"
-                  class="w-full bg-zinc-800 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm
-                         focus:outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
+                  class="w-full bg-[#001220] border border-sky-500/20 rounded-lg px-3 py-2.5 text-white text-sm
+                         focus:outline-none focus:border-sky-400/60 transition-colors placeholder:text-slate-500"
                   placeholder="email@exemplo.com" />
                 @if (emailInput.invalid && emailInput.touched) {
                   <p class="text-red-400 text-xs mt-1">Email inválido.</p>
@@ -89,26 +89,26 @@ import { BidPayload } from '../../models/auction.models';
 
               <!-- Empresa (opcional) -->
               <div>
-                <label class="block text-sm text-zinc-400 mb-1.5">Empresa <span class="text-zinc-600">(opcional)</span></label>
+                <label class="block text-sm text-slate-400 mb-1.5">Empresa <span class="text-slate-500">(opcional)</span></label>
                 <input type="text" name="company"
                   [(ngModel)]="payload.company"
-                  class="w-full bg-zinc-800 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm
-                         focus:outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
+                  class="w-full bg-[#001220] border border-sky-500/20 rounded-lg px-3 py-2.5 text-white text-sm
+                         focus:outline-none focus:border-sky-400/60 transition-colors placeholder:text-slate-500"
                   placeholder="Nome da empresa" />
               </div>
             } @else {
-              <div class="bg-zinc-800/50 border border-white/5 rounded-lg px-4 py-3 text-sm text-zinc-400">
+              <div class="bg-[#001220]/70 border border-sky-500/10 rounded-lg px-4 py-3 text-sm text-slate-400">
                 A sua identidade não será associada ao lance.
               </div>
             }
 
             <!-- Valor -->
             <div>
-              <label class="block text-sm text-zinc-400 mb-1.5">Valor do Lance (Kz) *</label>
+              <label class="block text-sm text-slate-400 mb-1.5">Valor do Lance (Kz) *</label>
               <input type="number" name="amount" required [min]="minBid"
                 [(ngModel)]="payload.amount" #amountInput="ngModel"
-                class="w-full bg-zinc-800 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm
-                       focus:outline-none focus:border-violet-500 transition-colors"
+                class="w-full bg-[#001220] border border-sky-500/20 rounded-lg px-3 py-2.5 text-white text-sm
+                       focus:outline-none focus:border-sky-400/60 transition-colors"
                 [placeholder]="minBid.toString()" />
               @if (amountInput.invalid && amountInput.touched) {
                 <p class="text-red-400 text-xs mt-1">Valor mínimo: {{ minBid }} Kz.</p>
@@ -116,7 +116,7 @@ import { BidPayload } from '../../models/auction.models';
             </div>
 
             <button type="submit" [disabled]="loading()"
-              class="w-full bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-700 disabled:cursor-not-allowed
+              class="w-full bg-[#2d0f3c] hover:bg-[#3f1654] border border-purple-500/35 disabled:opacity-50 disabled:cursor-not-allowed
                      text-white font-semibold rounded-xl py-3 transition-colors mt-2">
               @if (loading()) {
                 <span class="inline-flex items-center gap-2">

@@ -4,18 +4,18 @@ import { Component, Input, OnInit, OnDestroy, signal, computed } from '@angular/
   selector: 'app-countdown',
   template: `
     @if (expired()) {
-      <span class="text-red-400 font-semibold text-sm">Encerrado</span>
+      <span class="text-rose-300 font-semibold text-sm">Encerrado</span>
     } @else {
-      <div class="flex gap-2 items-center">
+      <div class="flex items-center gap-1">
         @for (unit of units(); track unit.label) {
-          <div class="text-center">
-            <div class="bg-white/10 rounded-lg px-2 py-1 min-w-[2.5rem] tabular-nums">
-              <span class="text-lg font-bold leading-none text-white">{{ unit.value }}</span>
+          <div class="flex flex-col items-center">
+            <div class="bg-[#001220] text-white font-mono text-[14px] font-bold px-1.5 py-0.5 rounded border border-[#0c82cd]/20 min-w-[2rem] text-center tabular-nums">
+              {{ unit.value }}
             </div>
-            <span class="text-[10px] text-zinc-400 mt-0.5 block">{{ unit.label }}</span>
+            <span class="text-[8px] text-slate-500 font-medium mt-0.5">{{ unit.label }}</span>
           </div>
           @if (!$last) {
-            <span class="text-zinc-500 font-bold mb-3">:</span>
+            <span class="text-sky-400 font-mono text-sm font-bold -mt-3.5">:</span>
           }
         }
       </div>

@@ -1,7 +1,7 @@
-<!-- Back -->
-<div class="max-w-7xl mx-auto px-4 pt-6">
+<!-- Voltar -->
+<div class="max-w-7xl mx-auto px-6 pt-6">
   <a routerLink="/"
-     class="inline-flex items-center gap-2 text-zinc-400 hover:text-white text-sm transition-colors">
+     class="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors">
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
     </svg>
@@ -11,66 +11,88 @@
 
 <!-- Loading -->
 @if (loading()) {
-  <div class="max-w-7xl mx-auto px-4 py-10 grid lg:grid-cols-2 gap-10 animate-pulse">
-    <div class="rounded-2xl overflow-hidden h-[480px] bg-zinc-800/60"></div>
+  <div class="max-w-7xl mx-auto px-6 py-10 grid lg:grid-cols-2 gap-10 animate-pulse">
+    <div class="rounded-3xl overflow-hidden h-[480px] bg-[#012845]/60"></div>
     <div class="space-y-4 pt-4">
-      <div class="h-6 bg-zinc-800/60 rounded w-1/3"></div>
-      <div class="h-10 bg-zinc-800/60 rounded w-2/3"></div>
-      <div class="h-4 bg-zinc-800/60 rounded w-full mt-4"></div>
-      <div class="h-4 bg-zinc-800/60 rounded w-3/4"></div>
+      <div class="h-6 bg-[#012845]/60 rounded w-1/3"></div>
+      <div class="h-10 bg-[#012845]/60 rounded w-2/3"></div>
+      <div class="h-4 bg-[#012845]/60 rounded w-full mt-4"></div>
+      <div class="h-4 bg-[#012845]/60 rounded w-3/4"></div>
     </div>
   </div>
 }
 
-<!-- Error -->
+<!-- Erro -->
 @if (error()) {
   <div class="flex flex-col items-center justify-center py-32 text-center gap-3">
     <span class="text-5xl">🔍</span>
-    <p class="text-red-400 font-semibold">{{ error() }}</p>
-    <a routerLink="/" class="text-violet-400 hover:underline text-sm">Voltar ao início</a>
+    <p class="text-rose-300 font-semibold">{{ error() }}</p>
+    <a routerLink="/" class="text-sky-400 hover:underline text-sm">Voltar ao início</a>
   </div>
 }
 
-<!-- Detail -->
+<!-- Detalhe -->
 @if (!loading() && artwork(); as a) {
-  <div class="max-w-7xl mx-auto px-4 py-8 grid lg:grid-cols-2 gap-10 pb-20">
+  <div class="max-w-7xl mx-auto px-6 py-8 grid lg:grid-cols-2 gap-10 pb-20">
 
-    <!-- Left: Image -->
+    <!-- Esquerda: Imagem + histórico -->
     <div>
-      <div class="rounded-2xl overflow-hidden border border-white/5 shadow-2xl">
+      <div class="rounded-2xl overflow-hidden shadow-lg border border-sky-500/20 bg-[#001220]">
         <img [src]="a.image" [alt]="a.title"
              class="w-full object-cover max-h-[500px]" />
       </div>
 
-      <!-- Bid history -->
+      <!-- Causa solidária -->
+      <div class="mt-6 flex items-start gap-3 bg-purple-950/20 border border-purple-500/20 rounded-2xl p-4">
+        <svg class="w-[18px] h-[18px] text-purple-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+        </svg>
+        <div>
+          <h5 class="font-semibold text-xs text-purple-300 uppercase tracking-wide">Causa de Solidariedade</h5>
+          <p class="text-xs text-[#ebd8ff]/80 mt-0.5 leading-relaxed">
+            100% do valor angariado nesta obra reverte para bolsas de estudo, apetrechamento de bibliotecas escolares
+            e suporte académico para jovens com mérito através da <strong>Associação PDPT</strong>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Histórico de lances -->
       <div class="mt-6">
-        <h3 class="text-white font-bold text-lg mb-3 flex items-center gap-2">
-          <svg class="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-          </svg>
-          Histórico de Lances
-          <span class="text-zinc-500 font-normal text-sm">({{ a.total_bids }})</span>
+        <h3 class="font-bold text-xs text-slate-400 uppercase tracking-widest border-b border-sky-500/10 pb-2 mb-3">
+          Histórico de Licitadores Recentes
+          <span class="text-slate-500 font-normal normal-case tracking-normal">({{ a.total_bids }})</span>
         </h3>
 
         @if (a.bids.length === 0) {
-          <div class="bg-zinc-900 border border-white/5 rounded-xl p-6 text-center text-zinc-500 text-sm">
-            Ainda não há lances. Seja o primeiro!
+          <div class="text-center py-4 text-slate-500 text-xs italic select-none">
+            Sem lances ainda. Seja o primeiro a apoiar esta causa!
           </div>
         } @else {
-          <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+          <div class="space-y-2.5 max-h-72 overflow-y-auto pr-2">
             @for (bid of a.bids; track bid.id) {
-              <div class="flex items-center justify-between bg-zinc-900 border border-white/5 rounded-xl px-4 py-3">
-                <div>
-                  <p class="text-white text-sm font-medium">{{ bid.bidder_name }}</p>
-                  @if (bid.company) {
-                    <p class="text-zinc-500 text-xs">{{ bid.company }}</p>
-                  }
-                  <p class="text-zinc-600 text-xs mt-0.5">{{ bid.created_at | date:'dd/MM/yyyy HH:mm' }}</p>
+              <div class="flex items-center justify-between bg-[#001220] border border-sky-500/5 p-3 rounded-xl">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-sky-950 border border-sky-500/20 text-[#0c82cd] font-extrabold text-xs flex items-center justify-center">
+                    {{ bid.bidder_name.substring(0, 2).toUpperCase() }}
+                  </div>
+                  <div>
+                    <span class="text-white text-xs font-bold block">{{ bid.bidder_name }}</span>
+                    @if (bid.company) {
+                      <span class="text-slate-500 text-[10px] block">{{ bid.company }}</span>
+                    }
+                    <span class="text-slate-500 text-[10px] block">{{ bid.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
                 </div>
-                <p class="text-amber-400 font-bold text-base">
-                  {{ bid.amount | currency:'AOA':'Kz ':'1.0-0' }}
-                </p>
+                <div>
+                  <span class="text-emerald-400 font-extrabold text-xs block text-right whitespace-nowrap">
+                    {{ bid.amount | currency:'AOA':'Kz ':'1.0-0' }}
+                  </span>
+                  @if ($first) {
+                    <span class="inline-flex gap-0.5 items-center bg-[#d99f2a]/15 text-[#d99f2a] text-[8px] font-bold uppercase tracking-wider px-1.5 rounded mt-0.5">
+                      🏆 Lance Líder
+                    </span>
+                  }
+                </div>
               </div>
             }
           </div>
@@ -78,64 +100,66 @@
       </div>
     </div>
 
-    <!-- Right: Info + Bid -->
-    <div class="flex flex-col gap-5">
-      <!-- Status badge -->
-      <div>
+    <!-- Direita: Info + Lance -->
+    <div class="flex flex-col gap-5 lg:bg-[#011d33] lg:rounded-3xl lg:border lg:border-sky-500/10 lg:p-8">
+      <!-- Badges -->
+      <div class="flex items-center gap-2">
         @if (a.is_active) {
           <span class="inline-flex items-center gap-1.5 bg-emerald-500/15 text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-full border border-emerald-500/30">
             <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
             Leilão em curso
           </span>
         } @else {
-          <span class="inline-flex items-center gap-1.5 bg-zinc-800 text-zinc-400 text-xs font-semibold px-3 py-1.5 rounded-full border border-white/10">
+          <span class="inline-flex items-center gap-1.5 bg-rose-500/15 text-rose-300 text-xs font-semibold px-3 py-1.5 rounded-full border border-rose-500/30">
             Leilão encerrado
           </span>
         }
+        <span class="bg-purple-500/15 text-purple-300 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-purple-500/20">
+          Obras de Angola
+        </span>
       </div>
 
       <div>
         <h1 class="text-4xl font-extrabold text-white leading-tight">{{ a.title }}</h1>
-        <p class="text-violet-400 font-medium text-lg mt-1">{{ a.artist }}</p>
+        <p class="text-sky-400 font-semibold text-lg mt-1">Por {{ a.artist }}</p>
       </div>
 
-      <p class="text-zinc-400 leading-relaxed">{{ a.description }}</p>
+      <p class="text-slate-300 text-sm leading-relaxed">{{ a.description }}</p>
 
-      <!-- Price card -->
-      <div class="bg-zinc-900 border border-white/10 rounded-2xl p-5 space-y-4">
+      <!-- Cartão de preço -->
+      <div class="bg-[#001220]/80 border border-sky-500/10 rounded-2xl p-5 space-y-4">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-zinc-500 text-xs font-medium uppercase tracking-wider">Lance actual</p>
-            <p class="text-3xl font-extrabold text-amber-400 mt-1">
+            <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Lance actual</p>
+            <p class="text-3xl font-black text-[#d99f2a] mt-1">
               {{ a.current_price | currency:'AOA':'Kz ':'1.0-0' }}
             </p>
           </div>
           <div class="text-right">
-            <p class="text-zinc-500 text-xs font-medium uppercase tracking-wider mb-2">Termina em</p>
+            <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Termina em</p>
             <app-countdown [auctionEnd]="a.auction_end" />
           </div>
         </div>
 
-        <div class="flex justify-between text-sm text-zinc-500 pt-2 border-t border-white/5">
-          <span>Valor inicial: <span class="text-zinc-400">{{ a.starting_price | currency:'AOA':'Kz ':'1.0-0' }}</span></span>
-          <span>Incremento mín: <span class="text-zinc-400">Kz 500</span></span>
+        <div class="flex justify-between text-sm text-slate-400 pt-2 border-t border-sky-500/10">
+          <span>Valor inicial: <span class="text-white">{{ a.starting_price | currency:'AOA':'Kz ':'1.0-0' }}</span></span>
+          <span>Incremento mín: <span class="text-white">Kz 500</span></span>
         </div>
       </div>
 
-      <!-- Bid button -->
+      <!-- Botão de lance -->
       @if (a.is_active) {
         <button (click)="showModal.set(true)"
-          class="w-full bg-violet-600 hover:bg-violet-500 active:bg-violet-700
-                 text-white font-bold text-lg rounded-2xl py-4
-                 shadow-lg shadow-violet-900/40 transition-all duration-200
-                 hover:shadow-violet-700/50 hover:-translate-y-0.5">
-          Fazer Lance
+          class="w-full bg-[#2d0f3c] hover:bg-[#3f1654] active:scale-[0.98] text-white font-bold text-sm tracking-wide
+                 rounded-xl py-3.5 border border-purple-500/35 shadow-[0_4px_12px_rgba(45,15,60,0.5)]
+                 transition-all cursor-pointer">
+          Submeter Licitação Solidária
         </button>
-        <p class="text-center text-zinc-600 text-xs">
-          Lance mínimo aceite: <span class="text-zinc-400">{{ minBid() | currency:'AOA':'Kz ':'1.0-0' }}</span>
+        <p class="text-center text-slate-500 text-xs">
+          Lance mínimo aceite: <span class="text-slate-300">{{ minBid() | currency:'AOA':'Kz ':'1.0-0' }}</span>
         </p>
       } @else {
-        <div class="w-full bg-zinc-800 text-zinc-500 font-semibold text-center rounded-2xl py-4 cursor-not-allowed">
+        <div class="w-full bg-[#001220] text-slate-500 font-semibold text-center rounded-xl py-3.5 cursor-not-allowed border border-sky-500/10">
           Leilão encerrado
         </div>
       }
@@ -144,7 +168,7 @@
   </div>
 }
 
-<!-- Bid Modal -->
+<!-- Modal de lance -->
 @if (showModal() && artwork()) {
   <app-bid-modal
     [artworkId]="artwork()!.id"

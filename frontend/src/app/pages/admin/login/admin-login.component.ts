@@ -7,7 +7,7 @@ import { AdminService } from '../../../services/admin.service';
   selector: 'app-admin-login',
   imports: [FormsModule, RouterLink],
   template: `
-    <div class="min-h-screen flex items-center justify-center px-4 bg-[#0f0f13]">
+    <div class="min-h-screen flex items-center justify-center px-4 bg-[#013457]">
       <div class="w-full max-w-sm">
 
         <!-- Logo -->

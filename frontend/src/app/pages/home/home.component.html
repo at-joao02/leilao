@@ -1,111 +1,252 @@
 <!-- Hero -->
-<section class="relative overflow-hidden py-20 px-4">
-  <div class="absolute inset-0 bg-gradient-to-b from-violet-900/30 via-transparent to-transparent pointer-events-none"></div>
-  <div class="max-w-7xl mx-auto text-center relative">
-    <p class="text-violet-400 font-semibold text-sm tracking-widest uppercase mb-3">Leilão em curso</p>
-    <h1 class="text-5xl sm:text-6xl font-extrabold text-white leading-tight">
-      Arte que<br class="hidden sm:block" />
-      <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-500">transforma</span>
-    </h1>
-    <p class="mt-5 text-zinc-400 text-lg max-w-xl mx-auto">
-      Adquira obras únicas de artistas angolanos. Faça o seu lance e leve arte para casa.
+<div class="relative pt-12 pb-16 px-6 text-center max-w-4xl mx-auto flex flex-col items-center">
+  <!-- Brilho radial de fundo -->
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] radial-glow pointer-events-none"></div>
+
+  <!-- Logo da associação -->
+  <div class="relative mb-8">
+    <img src="logo.png" alt="Associação PDPT — Promoção, Desenvolvimento, Prosperidade e Tecnologia"
+         class="h-28 md:h-32 w-auto drop-shadow-[0_0_15px_rgba(12,130,205,0.25)] select-none" />
+  </div>
+
+  <!-- Título principal -->
+  <h1 class="relative text-5xl md:text-6xl font-bold tracking-tight text-white mb-6 drop-shadow-sm">
+    Leilão Solidário
+  </h1>
+
+  <p class="font-semibold text-lg md:text-xl text-sky-400 mb-4 max-w-2xl leading-relaxed">
+    Obras únicas de artistas angolanos
+  </p>
+
+  <div class="text-sm md:text-[15px] font-medium leading-relaxed text-[#ebd8ff]/90 max-w-3xl space-y-2 select-none">
+    <p>
+      Doadas especialmente para o 5º aniversário da Associação PDPT,
+      cada licitação ajuda a apoiar ainda mais jovens angolanos
+    </p>
+    <p>no seu percurso académico e cívico.</p>
+    <p class="text-white font-semibold pt-1">
+      Faça a sua licitação às obras abaixo e inscreva o seu nome no futuro de Angola.
     </p>
   </div>
-</section>
 
-<!-- Content -->
-<section class="max-w-7xl mx-auto px-4 pb-20">
+  <!-- Divisor geométrico -->
+  <div class="mt-10 flex items-center gap-3">
+    <div class="h-[1px] w-8 bg-gradient-to-r from-transparent to-sky-500/30"></div>
+    <div class="h-2 w-2 rounded-full border border-sky-500/40 bg-sky-500/20"></div>
+    <div class="h-[1px] w-8 bg-gradient-to-l from-transparent to-sky-500/30"></div>
+  </div>
+</div>
+
+<!-- Conteúdo -->
+<main class="max-w-7xl mx-auto px-6 relative pb-20">
 
   <!-- Loading -->
   @if (loading()) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      @for (_ of [1,2,3,4,5,6]; track $index) {
-        <div class="bg-zinc-800/50 rounded-2xl overflow-hidden animate-pulse">
-          <div class="h-56 bg-zinc-700/60"></div>
-          <div class="p-5 space-y-3">
-            <div class="h-4 bg-zinc-700/60 rounded w-3/4"></div>
-            <div class="h-3 bg-zinc-700/60 rounded w-1/2"></div>
-            <div class="h-8 bg-zinc-700/60 rounded mt-4"></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      @for (_ of [1,2,3,4]; track $index) {
+        <div class="bg-[#012845]/60 rounded-3xl overflow-hidden animate-pulse border-2 border-[#013457]/50">
+          <div class="aspect-[16/10] bg-[#024675]/40"></div>
+          <div class="p-6 space-y-3">
+            <div class="h-4 bg-[#024675]/40 rounded w-3/4"></div>
+            <div class="h-3 bg-[#024675]/40 rounded w-1/2"></div>
+            <div class="h-10 bg-[#024675]/40 rounded-2xl mt-4"></div>
           </div>
         </div>
       }
     </div>
   }
 
-  <!-- Error -->
+  <!-- Erro -->
   @if (error()) {
     <div class="flex flex-col items-center justify-center py-24 text-center gap-4">
       <span class="text-5xl">⚠️</span>
-      <p class="text-red-400 font-semibold text-lg">{{ error() }}</p>
-      <p class="text-zinc-500 text-sm">Execute <code class="bg-zinc-800 px-2 py-0.5 rounded">npm start</code> na pasta <code class="bg-zinc-800 px-2 py-0.5 rounded">leilao-app</code></p>
+      <p class="text-rose-300 font-semibold text-lg">{{ error() }}</p>
+      <p class="text-slate-400 text-sm">Execute <code class="bg-[#001220] px-2 py-0.5 rounded">npm start</code> na pasta <code class="bg-[#001220] px-2 py-0.5 rounded">leilao-app</code></p>
     </div>
   }
 
-  <!-- Grid -->
   @if (!loading() && !error()) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      @for (artwork of artworks(); track artwork.id) {
-        <a [routerLink]="['/artworks', artwork.id]"
-           class="group bg-zinc-900 border border-white/5 rounded-2xl overflow-hidden
-                  hover:border-violet-500/50 hover:shadow-lg hover:shadow-violet-900/20
-                  transition-all duration-300 flex flex-col cursor-pointer">
 
-          <!-- Image -->
-          <div class="relative overflow-hidden h-56">
-            <img [src]="artwork.image" [alt]="artwork.title"
-                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                 loading="lazy" />
-            <!-- Badge ativo/encerrado -->
-            @if (artwork.is_active) {
-              <span class="absolute top-3 left-3 bg-emerald-500/90 text-white text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">
-                Activo
+    <!-- Painel de estatísticas -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 rounded-3xl bg-[#012845]/75 border border-sky-500/10 shadow-lg backdrop-blur-sm mb-12 select-none">
+      <div class="p-4 border-r border-[#0c82cd]/10 flex items-center gap-3">
+        <svg class="w-6 h-6 text-[#d99f2a] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+        </svg>
+        <div>
+          <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Total Angariado</span>
+          <span class="text-sm md:text-base font-extrabold text-[#d99f2a] block">
+            {{ totalRaised() | currency:'AOA':'Kz ':'1.0-0' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="p-4 md:border-r border-[#0c82cd]/10 flex items-center gap-3">
+        <svg class="w-6 h-6 text-sky-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <div>
+          <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Lances Registados</span>
+          <span class="text-sm md:text-base font-bold text-white block">{{ totalBids() }} licitações</span>
+        </div>
+      </div>
+
+      <div class="p-4 border-r border-[#0c82cd]/10 flex items-center gap-3">
+        <svg class="w-6 h-6 text-amber-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+        </svg>
+        <div>
+          <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Obras de Arte</span>
+          <span class="text-sm md:text-base font-bold text-white block">{{ artworks().length }} Obras Doadas</span>
+        </div>
+      </div>
+
+      <div class="p-4 flex items-center gap-3">
+        <svg class="w-6 h-6 text-rose-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+        </svg>
+        <div>
+          <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Fins Solidários</span>
+          <span class="text-[11px] md:text-xs font-semibold text-rose-300 block">Educação &amp; Civicismo</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pesquisa e filtros -->
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+      <div class="relative w-full md:w-80">
+        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+        </span>
+        <input
+          type="text"
+          [value]="searchQuery()"
+          (input)="searchQuery.set($any($event.target).value)"
+          placeholder="Pesquisar obras, artistas..."
+          class="w-full bg-[#001220]/70 border border-[#0c82cd]/20 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400/50 transition-all" />
+      </div>
+
+      <div class="flex items-center gap-1.5 bg-[#001220]/70 border border-[#0c82cd]/20 p-1.5 rounded-2xl select-none overflow-x-auto max-w-full">
+        @for (artist of artists(); track artist) {
+          <button
+            (click)="selectedArtist.set(artist)"
+            [class]="'px-4 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ' +
+              (selectedArtist() === artist
+                ? 'bg-[#0c82cd] text-white shadow-md font-bold'
+                : 'text-slate-400 hover:text-white')">
+            {{ artist === 'All' ? 'Todos Artistas' : artist }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Grelha de obras -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      @for (artwork of filtered(); track artwork.id) {
+        <div class="flex flex-col bg-[#012845] border-2 border-[#013457]/50 hover:border-sky-400/35 rounded-3xl overflow-hidden transition-all duration-300 shadow-xl group">
+
+          <!-- Imagem com badges -->
+          <div class="relative aspect-[16/10] overflow-hidden bg-slate-900">
+            <img [src]="artwork.image" [alt]="artwork.title" loading="lazy"
+                 class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" />
+
+            <div class="absolute top-4 left-4">
+              @if (artwork.is_active) {
+                <span class="inline-flex items-center gap-1 px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-full backdrop-blur-md shadow-sm select-none bg-emerald-500 text-[#0c2e1f]">
+                  <span class="h-1.5 w-1.5 rounded-full bg-[#0c2e1f] animate-pulse"></span>
+                  Activo
+                </span>
+              } @else {
+                <span class="inline-flex items-center gap-1 px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-full backdrop-blur-md shadow-sm select-none bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                  Terminado
+                </span>
+              }
+            </div>
+
+            <div class="absolute top-4 right-4">
+              <span class="inline-flex items-center px-3 py-1 text-[11px] font-semibold text-white/90 bg-black/40 backdrop-blur-md rounded-full shadow-sm select-none">
+                {{ artwork.total_bids }} {{ artwork.total_bids === 1 ? 'lance' : 'lances' }}
               </span>
-            } @else {
-              <span class="absolute top-3 left-3 bg-zinc-700/90 text-zinc-300 text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">
-                Encerrado
-              </span>
-            }
-            <!-- Total lances -->
-            <span class="absolute top-3 right-3 bg-black/60 text-zinc-300 text-xs px-2.5 py-1 rounded-full backdrop-blur-sm">
-              {{ artwork.total_bids }} lance{{ artwork.total_bids !== 1 ? 's' : '' }}
-            </span>
+            </div>
           </div>
 
-          <!-- Body -->
-          <div class="p-5 flex flex-col flex-1 gap-3">
-            <div>
-              <h2 class="text-white font-bold text-lg leading-snug group-hover:text-violet-300 transition-colors">
+          <!-- Conteúdo -->
+          <div class="flex-1 p-6 flex flex-col justify-between">
+            <div class="mb-6">
+              <h3 class="font-bold text-xl text-white mb-1 group-hover:text-sky-300 transition-colors duration-200">
                 {{ artwork.title }}
-              </h2>
-              <p class="text-zinc-500 text-sm">{{ artwork.artist }}</p>
+              </h3>
+              <p class="font-medium text-sm text-[#38bdf8] mb-3 select-none">{{ artwork.artist }}</p>
+              <p class="text-xs md:text-sm text-slate-300/85 leading-relaxed line-clamp-2">
+                {{ artwork.description }}
+              </p>
             </div>
 
-            <p class="text-zinc-400 text-sm line-clamp-2 flex-1">{{ artwork.description }}</p>
+            <div class="space-y-5">
+              <!-- Preço + Countdown -->
+              <div class="flex items-center justify-between gap-2 select-none border-t border-sky-500/10 pt-4">
+                <div>
+                  <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-1">Lance actual</p>
+                  <p class="font-extrabold text-[#d99f2a] text-xl">
+                    {{ artwork.current_price | currency:'AOA':'Kz ':'1.0-0' }}
+                  </p>
+                </div>
 
-            <!-- Price + Countdown -->
-            <div class="border-t border-white/5 pt-3 flex items-end justify-between gap-2">
-              <div>
-                <p class="text-zinc-500 text-xs">Lance actual</p>
-                <p class="text-amber-400 font-bold text-xl">
-                  {{ artwork.current_price | currency:'AOA':'Kz ':'1.0-0' }}
-                </p>
+                <div class="text-right">
+                  <p class="text-[9px] text-slate-400 font-medium uppercase tracking-widest text-right mb-1">Termina em</p>
+                  <app-countdown [auctionEnd]="artwork.auction_end" />
+                </div>
               </div>
-              <div class="text-right">
-                <p class="text-zinc-500 text-xs mb-1">Termina em</p>
-                <app-countdown [auctionEnd]="artwork.auction_end" />
-              </div>
-            </div>
 
-            <!-- CTA -->
-            <div class="bg-violet-600/10 group-hover:bg-violet-600 border border-violet-500/30 group-hover:border-transparent
-                        text-violet-300 group-hover:text-white text-center text-sm font-semibold
-                        rounded-xl py-2.5 transition-all duration-200">
-              Ver detalhes & Licitar
+              <!-- CTA -->
+              <a [routerLink]="['/artworks', artwork.id]"
+                 class="w-full flex items-center justify-center gap-2 bg-[#2d0f3c] hover:bg-[#3f1654] active:scale-[0.98]
+                        text-[#f5ebff] font-semibold text-sm py-3.5 px-6 rounded-2xl border border-purple-500/20
+                        shadow-[0_4px_12px_rgba(45,15,60,0.4)] hover:shadow-purple-500/10 hover:border-purple-500/40
+                        transition-all duration-300 select-none cursor-pointer">
+                Ver detalhes &amp; Licitar
+              </a>
             </div>
           </div>
-        </a>
+        </div>
+      }
+
+      @if (filtered().length === 0) {
+        <div class="col-span-1 md:col-span-2 text-center py-20 bg-[#012845]/50 border border-sky-400/10 rounded-3xl">
+          <span class="text-slate-400 text-sm block">Não foram encontradas obras com estes filtros de pesquisa.</span>
+        </div>
       }
     </div>
-  }
 
-</section>
+    <!-- Sobre a Iniciativa -->
+    <div class="mt-16 bg-gradient-to-r from-[#012845] to-[#011d33] border border-sky-500/10 rounded-3xl p-8 shadow-md">
+      <div class="flex flex-col md:flex-row items-start md:items-center gap-6 justify-between">
+        <div class="space-y-2">
+          <span class="text-[#a5ffc9] border border-[#a5ffc9]/20 bg-[#10b981]/10 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full inline-block">
+            Sobre a Iniciativa
+          </span>
+          <h3 class="font-bold text-2xl text-white">5º Aniversário da Associação PDPT</h3>
+          <p class="text-sm text-[#ebd8ff]/80 leading-relaxed max-w-3xl">
+            A Associação PDPT (Promoção, Desenvolvimento, Prosperidade e Tecnologia) promove projectos de capacitação
+            intelectual e científica para a juventude angolana. Ao participar neste Leilão Solidário, apoia directamente
+            na construção de salas digitais, apoio com bolsas e material de estudo qualificado para o futuro da nossa nação.
+          </p>
+        </div>
+
+        <div class="bg-[#012845] border border-[#0c82cd]/20 p-4 rounded-2xl flex items-center gap-3 shrink-0 max-w-sm">
+          <svg class="w-6 h-6 text-sky-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+          </svg>
+          <p class="text-xs text-[#ebd8ff]/95 leading-tight">
+            Receberá atualizações em tempo real no seu contacto após efectuar lances.
+            Todos os dados são protegidos e recolhidos para fins do leilão solidário.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  }
+</main>
