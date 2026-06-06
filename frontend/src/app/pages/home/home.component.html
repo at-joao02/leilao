@@ -4,9 +4,9 @@
   <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] radial-glow pointer-events-none"></div>
 
   <!-- Logo da associação -->
-  <div class="relative mb-8">
+  <div class="relative mb-3">
     <img src="logo.png" alt="Associação PDPT — Promoção, Desenvolvimento, Prosperidade e Tecnologia"
-         class="h-28 md:h-32 w-auto drop-shadow-[0_0_15px_rgba(12,130,205,0.25)] select-none" />
+         class="h-40 md:h-52 w-auto drop-shadow-[0_0_15px_rgba(12,130,205,0.25)] select-none" />
   </div>
 
   <!-- Título principal -->
@@ -15,15 +15,14 @@
   </h1>
 
   <p class="font-semibold text-lg md:text-xl text-sky-400 mb-4 max-w-2xl leading-relaxed">
-    Obras únicas de artistas angolanos
+    Obras únicas de Thó Simões e Cadjengue
   </p>
 
   <div class="text-sm md:text-[15px] font-medium leading-relaxed text-[#ebd8ff]/90 max-w-3xl space-y-2 select-none">
     <p>
       Doadas especialmente para o 5º aniversário da Associação PDPT,
-      cada licitação ajuda a apoiar ainda mais jovens angolanos
+      cada licitação ajuda a apoiar ainda mais jovens angolanos no seu percurso académico e cívico.
     </p>
-    <p>no seu percurso académico e cívico.</p>
     <p class="text-white font-semibold pt-1">
       Faça a sua licitação às obras abaixo e inscreva o seu nome no futuro de Angola.
     </p>
@@ -66,52 +65,6 @@
   }
 
   @if (!loading() && !error()) {
-
-    <!-- Painel de estatísticas -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 rounded-3xl bg-[#012845]/75 border border-sky-500/10 shadow-lg backdrop-blur-sm mb-12 select-none">
-      <div class="p-4 border-r border-[#0c82cd]/10 flex items-center gap-3">
-        <svg class="w-6 h-6 text-[#d99f2a] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
-        </svg>
-        <div>
-          <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Total Angariado</span>
-          <span class="text-sm md:text-base font-extrabold text-[#d99f2a] block">
-            {{ totalRaised() | currency:'AOA':'Kz ':'1.0-0' }}
-          </span>
-        </div>
-      </div>
-
-      <div class="p-4 md:border-r border-[#0c82cd]/10 flex items-center gap-3">
-        <svg class="w-6 h-6 text-sky-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
-        <div>
-          <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Lances Registados</span>
-          <span class="text-sm md:text-base font-bold text-white block">{{ totalBids() }} licitações</span>
-        </div>
-      </div>
-
-      <div class="p-4 border-r border-[#0c82cd]/10 flex items-center gap-3">
-        <svg class="w-6 h-6 text-amber-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
-        </svg>
-        <div>
-          <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Obras de Arte</span>
-          <span class="text-sm md:text-base font-bold text-white block">{{ artworks().length }} Obras Doadas</span>
-        </div>
-      </div>
-
-      <div class="p-4 flex items-center gap-3">
-        <svg class="w-6 h-6 text-rose-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-        </svg>
-        <div>
-          <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Fins Solidários</span>
-          <span class="text-[11px] md:text-xs font-semibold text-rose-300 block">Educação &amp; Civicismo</span>
-        </div>
-      </div>
-    </div>
 
     <!-- Pesquisa e filtros -->
     <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">

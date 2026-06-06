@@ -35,9 +35,6 @@ export class HomeComponent implements OnInit {
     });
   });
 
-  totalRaised = computed(() => this.artworks().reduce((acc, a) => acc + a.current_price, 0));
-  totalBids   = computed(() => this.artworks().reduce((acc, a) => acc + a.total_bids, 0));
-
   ngOnInit() {
     this.auctionSvc.getArtworks().subscribe({
       next: (data) => { this.artworks.set(data); this.loading.set(false); },
