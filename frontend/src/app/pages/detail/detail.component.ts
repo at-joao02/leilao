@@ -4,13 +4,14 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { AuctionService } from '../../services/auction.service';
 import { CountdownComponent } from '../../components/countdown/countdown.component';
 import { BidModalComponent } from '../../components/bid-modal/bid-modal.component';
+import { ArtistModalComponent } from '../../components/artist-modal/artist-modal.component';
 import { ArtworkDetail } from '../../models/auction.models';
 
 const MIN_INCREMENT = 500;
 
 @Component({
   selector: 'app-detail',
-  imports: [RouterLink, CurrencyPipe, DatePipe, CountdownComponent, BidModalComponent],
+  imports: [RouterLink, CurrencyPipe, DatePipe, CountdownComponent, BidModalComponent, ArtistModalComponent],
   templateUrl: './detail.component.html',
 })
 export class DetailComponent implements OnInit {
@@ -21,6 +22,7 @@ export class DetailComponent implements OnInit {
   loading = signal(true);
   error = signal('');
   showModal = signal(false);
+  showArtistModal = signal(false);
 
   minBid = computed(() => {
     const a = this.artwork();
