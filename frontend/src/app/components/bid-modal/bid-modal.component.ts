@@ -33,9 +33,6 @@ import { BidPayload } from '../../models/auction.models';
         @if (success()) {
           <div class="bg-emerald-500/20 border border-emerald-500/40 rounded-lg p-4 text-center">
             <p class="text-emerald-400 font-semibold text-lg">Lance registado!</p>
-            @if (!payload.is_anonymous) {
-              <p class="text-slate-300 text-sm mt-1">Verifique o seu email para confirmação.</p>
-            }
           </div>
         } @else {
 
@@ -71,19 +68,6 @@ import { BidPayload } from '../../models/auction.models';
                   placeholder="O seu nome" />
                 @if (nameInput.invalid && nameInput.touched) {
                   <p class="text-red-400 text-xs mt-1">Nome obrigatório.</p>
-                }
-              </div>
-
-              <!-- Email -->
-              <div>
-                <label class="block text-sm text-slate-400 mb-1.5">Email *</label>
-                <input type="email" name="email" required email
-                  [(ngModel)]="payload.email" #emailInput="ngModel"
-                  class="w-full bg-[#001220] border border-sky-500/20 rounded-lg px-3 py-2.5 text-white text-sm
-                         focus:outline-none focus:border-sky-400/60 transition-colors placeholder:text-slate-500"
-                  placeholder="email@exemplo.com" />
-                @if (emailInput.invalid && emailInput.touched) {
-                  <p class="text-red-400 text-xs mt-1">Email inválido.</p>
                 }
               </div>
 
@@ -152,7 +136,6 @@ export class BidModalComponent {
 
   payload: BidPayload = {
     name: '',
-    email: '',
     company: '',
     amount: 0,
     is_anonymous: false,
@@ -161,11 +144,9 @@ export class BidModalComponent {
   onAnonymousChange(isAnon: boolean) {
     if (isAnon) {
       this.payload.name    = 'Anónimo';
-      this.payload.email   = 'anonimo@leilao.local';
       this.payload.company = '';
     } else {
-      this.payload.name  = '';
-      this.payload.email = '';
+      this.payload.name = '';
     }
   }
 

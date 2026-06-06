@@ -54,7 +54,6 @@ export interface ArtworkDetail extends Artwork {
 
 export interface BidPayload {
   name: string;
-  email: string;
   company?: string;
   amount: number;
   is_anonymous: boolean;

@@ -463,9 +463,6 @@
                   <div class="min-w-0">
                     <p class="text-white text-sm font-medium truncate">
                       {{ bid.is_anonymous ? 'Anónimo' : bid.name }}
-                      @if (bid.is_anonymous) {
-                        <span class="ml-1 text-zinc-600 text-xs font-normal">({{ bid.email }})</span>
-                      }
                     </p>
                     @if (!bid.is_anonymous && bid.company) {
                       <p class="text-zinc-500 text-xs truncate">{{ bid.company }}</p>

@@ -1,7 +1,7 @@
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 const { Router } = require('express');
 const { Artwork, Artist, Bidder, Bid } = require('./models');
-const { sendBidConfirmationToBuyer, sendBidNotificationToAdmin } = require('./mailer');
+const { sendBidNotificationToAdmin } = require('./mailer');
 
 const router = Router();
 
@@ -55,14 +55,11 @@ router.post('/artworks/:id/bid', async (req, res) => {
     return res.status(400).json({ error: 'O leilão desta obra já encerrou.' });
   }
 
-  const { name, email, company, amount, is_anonymous } = req.body;
+  const { name, company, amount, is_anonymous } = req.body;
 
   // ── Validação de campos obrigatórios ──
   if (!name || typeof name !== 'string' || !name.trim()) {
     return res.status(400).json({ error: 'O campo "name" é obrigatório.' });
-  }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ error: 'Email inválido.' });
   }
   if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) {
     return res.status(400).json({ error: 'O valor do lance deve ser um número positivo.' });
@@ -81,7 +78,7 @@ router.post('/artworks/:id/bid', async (req, res) => {
   // ── Gravar licitante e lance ──
   const bidderId = Bidder.create({
     name: name.trim(),
-    email: email.trim().toLowerCase(),
+    email: '',
     company: company ? company.trim() : null,
     is_anonymous: Boolean(is_anonymous),
   });
@@ -89,33 +86,16 @@ router.post('/artworks/:id/bid', async (req, res) => {
   Bid.create({ artwork_id: artwork.id, bidder_id: bidderId, amount });
   Artwork.updateCurrentPrice(artwork.id, amount);
 
-  // ── Envio de emails (não bloqueia a resposta se falhar) ──
-  const emailJobs = [
-    sendBidConfirmationToBuyer({
-      to: email,
-      name: name.trim(),
-      artworkTitle: artwork.title,
-      artist: artwork.artist,
-      amount,
-      auctionEnd: artwork.auction_end,
-    }),
-    sendBidNotificationToAdmin({
-      artworkTitle: artwork.title,
-      artist: artwork.artist,
-      bidderName: name.trim(),
-      bidderEmail: email,
-      company: company || null,
-      amount,
-      isAnonymous: Boolean(is_anonymous),
-    }),
-  ];
-
-  Promise.allSettled(emailJobs).then(results => {
-    results.forEach((r, i) => {
-      if (r.status === 'rejected') {
-        console.error(`[mailer] email ${i} falhou:`, r.reason?.message);
-      }
-    });
+  // ── Notificação ao admin (não bloqueia a resposta se falhar) ──
+  sendBidNotificationToAdmin({
+    artworkTitle: artwork.title,
+    artist: artwork.artist,
+    bidderName: name.trim(),
+    company: company || null,
+    amount,
+    isAnonymous: Boolean(is_anonymous),
+  }).catch(err => {
+    console.error('[mailer] notificação ao admin falhou:', err?.message);
   });
 
   res.status(201).json({

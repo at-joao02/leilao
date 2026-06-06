@@ -19,31 +19,7 @@ function formatCurrency(value) {
   }).format(value);
 }
 
-async function sendBidConfirmationToBuyer({ to, name, artworkTitle, artist, amount, auctionEnd }) {
-  const endDate = new Date(auctionEnd).toLocaleString('pt-AO', {
-    dateStyle: 'long',
-    timeStyle: 'short',
-  });
-
-  await transporter.sendMail({
-    from: `"Leilão de Artes" <${process.env.EMAIL_USER}>`,
-    to,
-    subject: `Lance registado — ${artworkTitle}`,
-    html: `
-      <h2>O seu lance foi registado com sucesso!</h2>
-      <p>Olá, <strong>${name}</strong>.</p>
-      <table cellpadding="6" style="border-collapse:collapse">
-        <tr><td><strong>Obra:</strong></td><td>${artworkTitle}</td></tr>
-        <tr><td><strong>Artista:</strong></td><td>${artist}</td></tr>
-        <tr><td><strong>O seu lance:</strong></td><td>${formatCurrency(amount)}</td></tr>
-        <tr><td><strong>Leilão termina:</strong></td><td>${endDate}</td></tr>
-      </table>
-      <p>Boa sorte!</p>
-    `,
-  });
-}
-
-async function sendBidNotificationToAdmin({ artworkTitle, artist, bidderName, bidderEmail, company, amount, isAnonymous }) {
+async function sendBidNotificationToAdmin({ artworkTitle, artist, bidderName, company, amount, isAnonymous }) {
   const displayName = isAnonymous ? 'Anónimo' : bidderName;
   const companyLine = company ? `<tr><td><strong>Empresa:</strong></td><td>${company}</td></tr>` : '';
 
@@ -58,7 +34,6 @@ async function sendBidNotificationToAdmin({ artworkTitle, artist, bidderName, bi
         <tr><td><strong>Artista:</strong></td><td>${artist}</td></tr>
         <tr><td><strong>Valor:</strong></td><td>${formatCurrency(amount)}</td></tr>
         <tr><td><strong>Licitante:</strong></td><td>${displayName}</td></tr>
-        ${isAnonymous ? '' : `<tr><td><strong>Email:</strong></td><td>${bidderEmail}</td></tr>`}
         ${companyLine}
         <tr><td><strong>Anónimo:</strong></td><td>${isAnonymous ? 'Sim' : 'Não'}</td></tr>
       </table>
@@ -66,4 +41,4 @@ async function sendBidNotificationToAdmin({ artworkTitle, artist, bidderName, bi
   });
 }
 
-module.exports = { sendBidConfirmationToBuyer, sendBidNotificationToAdmin };
+module.exports = { sendBidNotificationToAdmin };
