@@ -1,15 +1,22 @@
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 const { Router } = require('express');
 const db = require('./db');
-const { Artwork, Artist } = require('./models');
+const { Artwork, Artist, User } = require('./models');
 
 const router = Router();
 
-// ── Auth middleware ───────────────────────────────────────────────────────────
+// ── Auth ──────────────────────────────────────────────────────────────────────
+
+function verifyAdminPassword(provided) {
+  if (!provided) return false;
+  const admin = User.findAdmin();
+  if (admin) return User.verifyPassword(provided, admin.password_hash);
+  // Fallback enquanto não existir utilizador na BD
+  return provided === process.env.ADMIN_PASSWORD;
+}
 
 function requireAdmin(req, res, next) {
-  const provided = req.headers['x-admin-password'];
-  if (!provided || provided !== process.env.ADMIN_PASSWORD) {
+  if (!verifyAdminPassword(req.headers['x-admin-password'])) {
     return res.status(401).json({ error: 'Não autorizado.' });
   }
   next();
@@ -19,7 +26,7 @@ function requireAdmin(req, res, next) {
 
 router.post('/login', (req, res) => {
   const { password } = req.body;
-  if (password === process.env.ADMIN_PASSWORD) {
+  if (verifyAdminPassword(password)) {
     return res.json({ ok: true });
   }
   res.status(401).json({ error: 'Password incorrecta.' });

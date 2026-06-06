@@ -4,8 +4,19 @@ const cors    = require('cors');
 const routes       = require('./routes');
 const adminRoutes  = require('./admin.routes');
 
+const { User } = require('./models');
+
 const app  = express();
 const PORT = process.env.PORT || 3000;
+
+// Seed: cria o utilizador admin na BD a partir do .env, se ainda não existir
+if (User.count() === 0 && process.env.ADMIN_PASSWORD) {
+  User.create({
+    email: process.env.ADMIN_EMAIL || 'admin@leilao.local',
+    password: process.env.ADMIN_PASSWORD,
+  });
+  console.log(`Utilizador admin criado na base de dados (${process.env.ADMIN_EMAIL || 'admin@leilao.local'})`);
+}
 
 app.use(cors());
 app.use(express.json());

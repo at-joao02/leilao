@@ -1,4 +1,41 @@
 const db = require('./db');
+const crypto = require('crypto');
+
+// ── Users ─────────────────────────────────────────────────────────────────────
+
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  return `${salt}:${hash}`;
+}
+
+const User = {
+  count() {
+    return db.prepare('SELECT COUNT(*) AS c FROM users').get().c;
+  },
+
+  findAdmin() {
+    return db.prepare("SELECT * FROM users WHERE role = 'admin' ORDER BY id LIMIT 1").get();
+  },
+
+  create({ email, password, role = 'admin' }) {
+    const result = db.prepare(
+      'INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)'
+    ).run(email, hashPassword(password), role);
+    return result.lastInsertRowid;
+  },
+
+  verifyPassword(password, stored) {
+    const [salt, hash] = stored.split(':');
+    if (!salt || !hash) return false;
+    const candidate = crypto.scryptSync(password, salt, 64);
+    return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), candidate);
+  },
+
+  updatePassword(id, password) {
+    db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(hashPassword(password), id);
+  },
+};
 
 // ── Artworks ──────────────────────────────────────────────────────────────────
 
@@ -105,4 +142,4 @@ const Bid = {
   },
 };
 
-module.exports = { Artwork, Artist, Bidder, Bid };
+module.exports = { Artwork, Artist, Bidder, Bid, User };
