@@ -1,7 +1,7 @@
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 const { Router } = require('express');
 const db = require('./db');
-const { Artwork } = require('./models');
+const { Artwork, Artist } = require('./models');
 
 const router = Router();
 
@@ -134,6 +134,61 @@ router.delete('/artworks/:id', requireAdmin, (req, res) => {
   db.prepare('DELETE FROM artworks WHERE id = ?').run(artwork.id);
 
   res.json({ message: 'Obra eliminada.' });
+});
+
+// ── GET /admin/artists ────────────────────────────────────────────────────────
+
+router.get('/artists', requireAdmin, (req, res) => {
+  res.json(Artist.findAll());
+});
+
+// ── POST /admin/artists ───────────────────────────────────────────────────────
+
+router.post('/artists', requireAdmin, (req, res) => {
+  const { name, photo, bio } = req.body;
+
+  if (!name?.trim()) {
+    return res.status(400).json({ error: 'Campo obrigatório: name.' });
+  }
+  if (Artist.findByName(name.trim())) {
+    return res.status(409).json({ error: 'Já existe um artista com esse nome.' });
+  }
+
+  const id = Artist.create({ name: name.trim(), photo: photo?.trim(), bio: bio?.trim() });
+  res.status(201).json(Artist.findById(id));
+});
+
+// ── PUT /admin/artists/:id ────────────────────────────────────────────────────
+
+router.put('/artists/:id', requireAdmin, (req, res) => {
+  const artist = Artist.findById(req.params.id);
+  if (!artist) return res.status(404).json({ error: 'Artista não encontrado.' });
+
+  const { name, photo, bio } = req.body;
+  const newName = (name ?? artist.name).trim();
+
+  const conflict = Artist.findByName(newName);
+  if (conflict && conflict.id !== artist.id) {
+    return res.status(409).json({ error: 'Já existe um artista com esse nome.' });
+  }
+
+  Artist.update(artist.id, {
+    name:  newName,
+    photo: (photo ?? artist.photo ?? '').trim(),
+    bio:   (bio ?? artist.bio ?? '').trim(),
+  });
+
+  res.json(Artist.findById(artist.id));
+});
+
+// ── DELETE /admin/artists/:id ─────────────────────────────────────────────────
+
+router.delete('/artists/:id', requireAdmin, (req, res) => {
+  const artist = Artist.findById(req.params.id);
+  if (!artist) return res.status(404).json({ error: 'Artista não encontrado.' });
+
+  Artist.delete(artist.id);
+  res.json({ message: 'Artista eliminado.' });
 });
 
 module.exports = router;

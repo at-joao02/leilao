@@ -1,6 +1,6 @@
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 const { Router } = require('express');
-const { Artwork, Bidder, Bid } = require('./models');
+const { Artwork, Artist, Bidder, Bid } = require('./models');
 const { sendBidConfirmationToBuyer, sendBidNotificationToAdmin } = require('./mailer');
 
 const router = Router();
@@ -18,6 +18,14 @@ router.get('/artworks', (req, res) => {
   }));
 
   res.json(result);
+});
+
+// ── GET /artists/:name ────────────────────────────────────────────────────────
+
+router.get('/artists/:name', (req, res) => {
+  const artist = Artist.findByName(req.params.name);
+  if (!artist) return res.status(404).json({ error: 'Artista não encontrado.' });
+  res.json(artist);
 });
 
 // ── GET /artworks/:id ─────────────────────────────────────────────────────────

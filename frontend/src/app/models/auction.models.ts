@@ -18,6 +18,19 @@ export interface Artwork {
   countdown: Countdown;
 }
 
+export interface ArtistRecord {
+  id: number;
+  name: string;
+  photo: string | null;
+  bio: string | null;
+}
+
+export interface ArtistPayload {
+  name: string;
+  photo?: string;
+  bio?: string;
+}
+
 export interface Bid {
   id: number;
   amount: number;

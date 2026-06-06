@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   AdminArtwork, AdminBidsResponse, ArtworkPayload, Artwork,
+  ArtistRecord, ArtistPayload,
 } from '../models/auction.models';
 import { environment } from '../../environments/environment';
 
@@ -47,5 +48,23 @@ export class AdminService {
 
   deleteArtwork(id: number): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${this.base}/artworks/${id}`, { headers: this.headers() });
+  }
+
+  // ── Artistas ────────────────────────────────────────────────────────────────
+
+  getArtists(): Observable<ArtistRecord[]> {
+    return this.http.get<ArtistRecord[]>(`${this.base}/artists`, { headers: this.headers() });
+  }
+
+  createArtist(payload: ArtistPayload): Observable<ArtistRecord> {
+    return this.http.post<ArtistRecord>(`${this.base}/artists`, payload, { headers: this.headers() });
+  }
+
+  updateArtist(id: number, payload: ArtistPayload): Observable<ArtistRecord> {
+    return this.http.put<ArtistRecord>(`${this.base}/artists/${id}`, payload, { headers: this.headers() });
+  }
+
+  deleteArtist(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.base}/artists/${id}`, { headers: this.headers() });
   }
 }

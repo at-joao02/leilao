@@ -29,6 +29,13 @@ db.exec(`
     is_anonymous INTEGER NOT NULL DEFAULT 0
   );
 
+  CREATE TABLE IF NOT EXISTS artists (
+    id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    name  TEXT    NOT NULL UNIQUE,
+    photo TEXT,
+    bio   TEXT
+  );
+
   CREATE TABLE IF NOT EXISTS bids (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     artwork_id INTEGER NOT NULL REFERENCES artworks(id),

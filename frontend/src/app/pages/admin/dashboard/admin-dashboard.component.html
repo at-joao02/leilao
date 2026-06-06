@@ -180,6 +180,92 @@
     </div>
   }
 
+  <!-- ── Artistas ─────────────────────────────────────────────────────────── -->
+  <div class="flex items-center justify-between pt-4">
+    <h2 class="text-white font-bold text-base">Artistas</h2>
+    <button (click)="openCreateArtist()"
+      class="inline-flex items-center gap-1.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Novo Artista
+    </button>
+  </div>
+
+  @if (artistsLoading()) {
+    <div class="space-y-2">
+      @for (_ of [1,2]; track $index) {
+        <div class="h-14 bg-zinc-800/40 rounded-xl animate-pulse"></div>
+      }
+    </div>
+  } @else {
+    <div class="bg-zinc-900 border border-white/5 rounded-2xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-white/5 text-zinc-500 text-xs font-medium uppercase tracking-wider">
+              <th class="text-left px-4 py-3">Artista</th>
+              <th class="text-left px-4 py-3 hidden md:table-cell">Biografia</th>
+              <th class="text-right px-4 py-3">Acções</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            @for (artist of artists(); track artist.id) {
+              <tr class="hover:bg-white/[0.02] transition-colors group">
+                <!-- Artista -->
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    @if (artist.photo) {
+                      <img [src]="artist.photo" [alt]="artist.name"
+                           class="w-10 h-10 rounded-full object-cover shrink-0" />
+                    } @else {
+                      <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center shrink-0">
+                        <span class="text-zinc-500 text-xs font-bold">{{ artist.name.substring(0, 2).toUpperCase() }}</span>
+                      </div>
+                    }
+                    <p class="text-white font-medium">{{ artist.name }}</p>
+                  </div>
+                </td>
+                <!-- Biografia -->
+                <td class="px-4 py-3 text-zinc-400 text-xs hidden md:table-cell max-w-md">
+                  <p class="line-clamp-2">{{ artist.bio || '—' }}</p>
+                </td>
+                <!-- Acções -->
+                <td class="px-4 py-3 text-right">
+                  <div class="inline-flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <button (click)="openEditArtist(artist)" title="Editar"
+                      class="p-1.5 text-zinc-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                    </button>
+                    <button (click)="openDeleteArtist(artist)" title="Eliminar"
+                      class="p-1.5 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+
+            @if (artists().length === 0) {
+              <tr>
+                <td colspan="3" class="px-4 py-10 text-center text-zinc-500">
+                  Nenhum artista cadastrado.
+                  <button (click)="openCreateArtist()" class="text-violet-400 hover:underline">Criar o primeiro</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
 </main>
 
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
@@ -390,6 +476,125 @@
           class="flex-1 bg-red-600 hover:bg-red-500 disabled:bg-zinc-700 disabled:cursor-not-allowed
                  text-white font-semibold rounded-xl py-2.5 transition-colors text-sm">
           @if (deleteLoading()) { A eliminar... } @else { Eliminar }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- Modal: Create / Edit Artist                                                -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+@if (showArtistForm()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4" (click)="showArtistForm.set(false)">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
+         (click)="$event.stopPropagation()">
+
+      <div class="flex items-center justify-between px-6 py-4 border-b border-white/5 sticky top-0 bg-zinc-900 rounded-t-2xl">
+        <h2 class="text-white font-bold text-lg">
+          {{ artistFormMode() === 'create' ? 'Novo Artista' : 'Editar Artista' }}
+        </h2>
+        <button (click)="showArtistForm.set(false)" class="text-zinc-400 hover:text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <form (ngSubmit)="submitArtistForm()" class="p-6 space-y-4">
+
+        @if (artistFormError()) {
+          <div class="bg-red-500/15 border border-red-500/30 rounded-lg px-4 py-3 text-red-300 text-sm">
+            {{ artistFormError() }}
+          </div>
+        }
+
+        <!-- Nome -->
+        <div>
+          <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Nome *</label>
+          <input type="text" required [value]="artistFormData().name"
+            (input)="patchArtistForm('name', $any($event.target).value)"
+            class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
+                   focus:outline-none focus:border-violet-500 transition-colors"
+            placeholder="Nome do artista (igual ao usado nas obras)" />
+          <p class="text-zinc-600 text-[11px] mt-1">
+            Deve ser exactamente igual ao campo "Artista" das obras para a ligação funcionar.
+          </p>
+        </div>
+
+        <!-- Fotografia -->
+        <div>
+          <label class="block text-xs text-zinc-400 mb-1.5 font-medium">URL da Fotografia</label>
+          <input type="url" [value]="artistFormData().photo"
+            (input)="patchArtistForm('photo', $any($event.target).value)"
+            class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
+                   focus:outline-none focus:border-violet-500 transition-colors"
+            placeholder="https://..." />
+          @if (artistFormData().photo) {
+            <img [src]="artistFormData().photo" alt="Pré-visualização"
+                 class="mt-2 w-16 h-16 rounded-full object-cover border border-white/10" />
+          }
+        </div>
+
+        <!-- Biografia -->
+        <div>
+          <label class="block text-xs text-zinc-400 mb-1.5 font-medium">Biografia</label>
+          <textarea rows="5" [value]="artistFormData().bio"
+            (input)="patchArtistForm('bio', $any($event.target).value)"
+            class="w-full bg-zinc-800 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
+                   focus:outline-none focus:border-violet-500 transition-colors resize-none"
+            placeholder="Texto sobre o artista mostrado ao público..."></textarea>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button type="button" (click)="showArtistForm.set(false)"
+            class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold rounded-xl py-2.5 transition-colors text-sm">
+            Cancelar
+          </button>
+          <button type="submit" [disabled]="artistFormLoading()"
+            class="flex-1 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-700 disabled:cursor-not-allowed
+                   text-white font-semibold rounded-xl py-2.5 transition-colors text-sm">
+            @if (artistFormLoading()) { A guardar... } @else { Guardar }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- Modal: Confirm Delete Artist                                               -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+@if (showArtistDelete() && deletingArtist()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4" (click)="showArtistDelete.set(false)">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-sm bg-zinc-900 border border-white/10 rounded-2xl p-6 shadow-2xl"
+         (click)="$event.stopPropagation()">
+
+      <div class="w-12 h-12 rounded-full bg-red-500/15 border border-red-500/30 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+      </div>
+
+      <h3 class="text-white font-bold text-lg text-center">Eliminar Artista</h3>
+      <p class="text-zinc-400 text-sm text-center mt-2 mb-6">
+        Tem a certeza que quer eliminar
+        <span class="text-white font-medium">"{{ deletingArtist()!.name }}"</span>?
+        As obras não são afectadas; a modal pública volta a usar o texto padrão.
+      </p>
+
+      <div class="flex gap-3">
+        <button (click)="showArtistDelete.set(false)"
+          class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold rounded-xl py-2.5 transition-colors text-sm">
+          Cancelar
+        </button>
+        <button (click)="confirmDeleteArtist()" [disabled]="artistDeleteLoading()"
+          class="flex-1 bg-red-600 hover:bg-red-500 disabled:bg-zinc-700 disabled:cursor-not-allowed
+                 text-white font-semibold rounded-xl py-2.5 transition-colors text-sm">
+          @if (artistDeleteLoading()) { A eliminar... } @else { Eliminar }
         </button>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Artwork, ArtworkDetail, BidPayload, BidResponse } from '../models/auction.models';
+import { Artwork, ArtworkDetail, ArtistRecord, BidPayload, BidResponse } from '../models/auction.models';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -15,6 +15,10 @@ export class AuctionService {
 
   getArtwork(id: number): Observable<ArtworkDetail> {
     return this.http.get<ArtworkDetail>(`${this.base}/artworks/${id}`);
+  }
+
+  getArtist(name: string): Observable<ArtistRecord> {
+    return this.http.get<ArtistRecord>(`${this.base}/artists/${encodeURIComponent(name)}`);
   }
 
   placeBid(artworkId: number, payload: BidPayload): Observable<BidResponse> {

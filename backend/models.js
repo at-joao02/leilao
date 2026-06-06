@@ -30,6 +30,38 @@ const Artwork = {
   },
 };
 
+// ── Artists ───────────────────────────────────────────────────────────────────
+
+const Artist = {
+  findAll() {
+    return db.prepare('SELECT * FROM artists ORDER BY name ASC').all();
+  },
+
+  findById(id) {
+    return db.prepare('SELECT * FROM artists WHERE id = ?').get(id);
+  },
+
+  findByName(name) {
+    return db.prepare('SELECT * FROM artists WHERE name = ? COLLATE NOCASE').get(name);
+  },
+
+  create({ name, photo, bio }) {
+    const result = db.prepare(
+      'INSERT INTO artists (name, photo, bio) VALUES (?, ?, ?)'
+    ).run(name, photo || '', bio || '');
+    return result.lastInsertRowid;
+  },
+
+  update(id, { name, photo, bio }) {
+    db.prepare('UPDATE artists SET name = ?, photo = ?, bio = ? WHERE id = ?')
+      .run(name, photo || '', bio || '', id);
+  },
+
+  delete(id) {
+    db.prepare('DELETE FROM artists WHERE id = ?').run(id);
+  },
+};
+
 // ── Bidders ───────────────────────────────────────────────────────────────────
 
 const Bidder = {
@@ -73,4 +105,4 @@ const Bid = {
   },
 };
 
-module.exports = { Artwork, Bidder, Bid };
+module.exports = { Artwork, Artist, Bidder, Bid };
