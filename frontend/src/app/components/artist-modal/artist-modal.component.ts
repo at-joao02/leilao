@@ -7,8 +7,10 @@ import { environment } from '../../../environments/environment';
   selector: 'app-artist-modal',
   template: `
     <!-- Backdrop -->
-    <div class="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
-         (click)="onBackdropClick($event)">
+    <div class="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md">
+      <!-- Wrapper de centragem: garante scroll quando o modal é mais alto que o ecrã -->
+      <div class="flex min-h-full items-center justify-center p-4"
+           (click)="onBackdropClick($event)">
 
       <!-- Modal -->
       <div class="relative w-full max-w-2xl bg-[#012845] border border-[#0c82cd]/30 rounded-3xl shadow-2xl overflow-hidden animate-fade-in"
@@ -35,15 +37,15 @@ import { environment } from '../../../environments/environment';
         } @else {
           <div class="flex flex-col md:flex-row">
 
-            <!-- Fotografia -->
+            <!-- Fotografia — em mobile aparece primeiro, em destaque -->
             <div class="md:w-2/5 shrink-0 bg-[#001220]">
               @if (artist().photo && !photoError()) {
                 <img [src]="artist().photo" [alt]="'Fotografia de ' + artist().name"
                      (error)="photoError.set(true)"
-                     class="w-full h-56 md:h-full object-cover" />
+                     class="w-full aspect-[4/3] md:aspect-auto md:h-full object-cover object-top" />
               } @else {
                 <!-- Avatar com iniciais quando não há fotografia -->
-                <div class="w-full h-56 md:h-full min-h-[14rem] flex items-center justify-center">
+                <div class="w-full aspect-[4/3] md:aspect-auto md:h-full md:min-h-[14rem] flex items-center justify-center">
                   <div class="w-24 h-24 rounded-full bg-sky-950 border border-sky-500/30 text-sky-400
                               font-black text-3xl flex items-center justify-center select-none">
                     {{ initials() }}
@@ -77,6 +79,7 @@ import { environment } from '../../../environments/environment';
 
           </div>
         }
+      </div>
       </div>
     </div>
   `,
