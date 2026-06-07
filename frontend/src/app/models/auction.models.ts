@@ -56,7 +56,6 @@ export interface BidPayload {
   name: string;
   company?: string;
   amount: number;
-  is_anonymous: boolean;
 }
 
 export interface BidResponse {
@@ -79,7 +78,6 @@ export interface AdminBid {
   name: string;
   email: string;
   company: string | null;
-  is_anonymous: 0 | 1;
 }
 
 export interface AdminBidsResponse {

@@ -112,10 +112,10 @@ const Artist = {
 // ── Bidders ───────────────────────────────────────────────────────────────────
 
 const Bidder = {
-  create({ name, email, company, is_anonymous }) {
+  create({ name, email, company }) {
     const result = db.prepare(
-      'INSERT INTO bidders (name, email, company, is_anonymous) VALUES (?, ?, ?, ?)'
-    ).run(name, email, company || null, is_anonymous ? 1 : 0);
+      'INSERT INTO bidders (name, email, company) VALUES (?, ?, ?)'
+    ).run(name, email, company || null);
     return result.lastInsertRowid;
   },
 };
@@ -135,8 +135,8 @@ const Bid = {
         b.id,
         b.amount,
         b.created_at,
-        CASE WHEN d.is_anonymous = 1 THEN 'Anónimo' ELSE d.name  END AS bidder_name,
-        CASE WHEN d.is_anonymous = 1 THEN NULL        ELSE d.company END AS company
+        d.name    AS bidder_name,
+        d.company AS company
       FROM bids b
       JOIN bidders d ON d.id = b.bidder_id
       WHERE b.artwork_id = ?

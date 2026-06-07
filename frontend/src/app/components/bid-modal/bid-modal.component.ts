@@ -44,47 +44,28 @@ import { BidPayload } from '../../models/auction.models';
 
           <form #bidForm="ngForm" (ngSubmit)="submit(bidForm.valid)" class="space-y-4">
 
-            <!-- Anónimo toggle -->
-            <label class="flex items-center gap-3 cursor-pointer select-none">
-              <div class="relative">
-                <input type="checkbox" class="sr-only peer"
-                  [(ngModel)]="payload.is_anonymous" name="is_anonymous"
-                  (ngModelChange)="onAnonymousChange($event)" />
-                <div class="w-10 h-5 bg-[#001220] border border-sky-500/30 rounded-full peer-checked:bg-sky-500 transition-colors"></div>
-                <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
-              </div>
-              <span class="text-sm text-slate-300">Lance anónimo</span>
-            </label>
+            <!-- Nome -->
+            <div>
+              <label class="block text-sm text-slate-400 mb-1.5">Nome *</label>
+              <input type="text" name="name" required
+                [(ngModel)]="payload.name" #nameInput="ngModel"
+                class="w-full bg-[#001220] border border-sky-500/20 rounded-lg px-3 py-2.5 text-white text-sm
+                       focus:outline-none focus:border-sky-400/60 transition-colors placeholder:text-slate-500"
+                placeholder="O seu nome" />
+              @if (nameInput.invalid && nameInput.touched) {
+                <p class="text-red-400 text-xs mt-1">Nome obrigatório.</p>
+              }
+            </div>
 
-            <!-- Campos de identidade — ocultados quando anónimo -->
-            @if (!payload.is_anonymous) {
-              <!-- Nome -->
-              <div>
-                <label class="block text-sm text-slate-400 mb-1.5">Nome *</label>
-                <input type="text" name="name" required
-                  [(ngModel)]="payload.name" #nameInput="ngModel"
-                  class="w-full bg-[#001220] border border-sky-500/20 rounded-lg px-3 py-2.5 text-white text-sm
-                         focus:outline-none focus:border-sky-400/60 transition-colors placeholder:text-slate-500"
-                  placeholder="O seu nome" />
-                @if (nameInput.invalid && nameInput.touched) {
-                  <p class="text-red-400 text-xs mt-1">Nome obrigatório.</p>
-                }
-              </div>
-
-              <!-- Empresa (opcional) -->
-              <div>
-                <label class="block text-sm text-slate-400 mb-1.5">Empresa <span class="text-slate-500">(opcional)</span></label>
-                <input type="text" name="company"
-                  [(ngModel)]="payload.company"
-                  class="w-full bg-[#001220] border border-sky-500/20 rounded-lg px-3 py-2.5 text-white text-sm
-                         focus:outline-none focus:border-sky-400/60 transition-colors placeholder:text-slate-500"
-                  placeholder="Nome da empresa" />
-              </div>
-            } @else {
-              <div class="bg-[#001220]/70 border border-sky-500/10 rounded-lg px-4 py-3 text-sm text-slate-400">
-                A sua identidade não será associada ao lance.
-              </div>
-            }
+            <!-- Empresa (opcional) -->
+            <div>
+              <label class="block text-sm text-slate-400 mb-1.5">Empresa <span class="text-slate-500">(opcional)</span></label>
+              <input type="text" name="company"
+                [(ngModel)]="payload.company"
+                class="w-full bg-[#001220] border border-sky-500/20 rounded-lg px-3 py-2.5 text-white text-sm
+                       focus:outline-none focus:border-sky-400/60 transition-colors placeholder:text-slate-500"
+                placeholder="Nome da empresa" />
+            </div>
 
             <!-- Valor -->
             <div>
@@ -138,17 +119,7 @@ export class BidModalComponent {
     name: '',
     company: '',
     amount: 0,
-    is_anonymous: false,
   };
-
-  onAnonymousChange(isAnon: boolean) {
-    if (isAnon) {
-      this.payload.name    = 'Anónimo';
-      this.payload.company = '';
-    } else {
-      this.payload.name = '';
-    }
-  }
 
   onBackdropClick(e: MouseEvent) {
     if (e.target === e.currentTarget) this.close.emit();

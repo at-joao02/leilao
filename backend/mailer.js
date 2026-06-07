@@ -19,8 +19,7 @@ function formatCurrency(value) {
   }).format(value);
 }
 
-async function sendBidNotificationToAdmin({ artworkTitle, artist, bidderName, company, amount, isAnonymous }) {
-  const displayName = isAnonymous ? 'Anónimo' : bidderName;
+async function sendBidNotificationToAdmin({ artworkTitle, artist, bidderName, company, amount }) {
   const companyLine = company ? `<tr><td><strong>Empresa:</strong></td><td>${company}</td></tr>` : '';
 
   await transporter.sendMail({
@@ -33,9 +32,8 @@ async function sendBidNotificationToAdmin({ artworkTitle, artist, bidderName, co
         <tr><td><strong>Obra:</strong></td><td>${artworkTitle}</td></tr>
         <tr><td><strong>Artista:</strong></td><td>${artist}</td></tr>
         <tr><td><strong>Valor:</strong></td><td>${formatCurrency(amount)}</td></tr>
-        <tr><td><strong>Licitante:</strong></td><td>${displayName}</td></tr>
+        <tr><td><strong>Licitante:</strong></td><td>${bidderName}</td></tr>
         ${companyLine}
-        <tr><td><strong>Anónimo:</strong></td><td>${isAnonymous ? 'Sim' : 'Não'}</td></tr>
       </table>
     `,
   });
