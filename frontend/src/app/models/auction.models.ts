@@ -44,7 +44,6 @@ export interface Bid {
   amount: number;
   created_at: string;
   bidder_name: string;
-  company: string | null;
 }
 
 export interface ArtworkDetail extends Artwork {
@@ -54,7 +53,7 @@ export interface ArtworkDetail extends Artwork {
 
 export interface BidPayload {
   name: string;
-  company?: string;
+  phone?: string;
   amount: number;
 }
 
@@ -77,7 +76,7 @@ export interface AdminBid {
   created_at: string;
   name: string;
   email: string;
-  company: string | null;
+  phone: string | null;
 }
 
 export interface AdminBidsResponse {

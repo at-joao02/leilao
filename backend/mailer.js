@@ -19,8 +19,8 @@ function formatCurrency(value) {
   }).format(value);
 }
 
-async function sendBidNotificationToAdmin({ artworkTitle, artist, bidderName, company, amount }) {
-  const companyLine = company ? `<tr><td><strong>Empresa:</strong></td><td>${company}</td></tr>` : '';
+async function sendBidNotificationToAdmin({ artworkTitle, artist, bidderName, phone, amount }) {
+  const phoneLine = phone ? `<tr><td><strong>Telefone:</strong></td><td>${phone}</td></tr>` : '';
 
   await transporter.sendMail({
     from: `"Leilão de Artes" <${process.env.EMAIL_USER}>`,
@@ -33,7 +33,7 @@ async function sendBidNotificationToAdmin({ artworkTitle, artist, bidderName, co
         <tr><td><strong>Artista:</strong></td><td>${artist}</td></tr>
         <tr><td><strong>Valor:</strong></td><td>${formatCurrency(amount)}</td></tr>
         <tr><td><strong>Licitante:</strong></td><td>${bidderName}</td></tr>
-        ${companyLine}
+        ${phoneLine}
       </table>
     `,
   });

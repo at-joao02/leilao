@@ -128,7 +128,7 @@ router.get('/artworks/:id/bids', requireAdmin, (req, res) => {
       b.created_at,
       d.name,
       d.email,
-      d.company
+      d.phone
     FROM bids b
     JOIN bidders d ON d.id = b.bidder_id
     WHERE b.artwork_id = ?

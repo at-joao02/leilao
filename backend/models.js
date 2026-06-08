@@ -112,10 +112,10 @@ const Artist = {
 // ── Bidders ───────────────────────────────────────────────────────────────────
 
 const Bidder = {
-  create({ name, email, company }) {
+  create({ name, email, phone }) {
     const result = db.prepare(
-      'INSERT INTO bidders (name, email, company) VALUES (?, ?, ?)'
-    ).run(name, email, company || null);
+      'INSERT INTO bidders (name, email, phone) VALUES (?, ?, ?)'
+    ).run(name, email, phone || null);
     return result.lastInsertRowid;
   },
 };
@@ -135,8 +135,7 @@ const Bid = {
         b.id,
         b.amount,
         b.created_at,
-        d.name    AS bidder_name,
-        d.company AS company
+        d.name    AS bidder_name
       FROM bids b
       JOIN bidders d ON d.id = b.bidder_id
       WHERE b.artwork_id = ?

@@ -57,14 +57,14 @@ import { BidPayload } from '../../models/auction.models';
               }
             </div>
 
-            <!-- Empresa (opcional) -->
+            <!-- Telefone (opcional) -->
             <div>
-              <label class="block text-sm text-slate-400 mb-1.5">Empresa <span class="text-slate-500">(opcional)</span></label>
-              <input type="text" name="company"
-                [(ngModel)]="payload.company"
+              <label class="block text-sm text-slate-400 mb-1.5">Telefone <span class="text-slate-500">(opcional)</span></label>
+              <input type="tel" name="phone" inputmode="tel"
+                [(ngModel)]="payload.phone"
                 class="w-full bg-[#001220] border border-sky-500/20 rounded-lg px-3 py-2.5 text-white text-sm
                        focus:outline-none focus:border-sky-400/60 transition-colors placeholder:text-slate-500"
-                placeholder="Nome da empresa" />
+                placeholder="Ex.: +244 923 000 000" />
             </div>
 
             <!-- Valor -->
@@ -117,7 +117,7 @@ export class BidModalComponent {
 
   payload: BidPayload = {
     name: '',
-    company: '',
+    phone: '',
     amount: 0,
   };
 
@@ -137,7 +137,7 @@ export class BidModalComponent {
     this.loading.set(true);
     this.auctionSvc.placeBid(this.artworkId, {
       ...this.payload,
-      company: this.payload.company || undefined,
+      phone: this.payload.phone || undefined,
     }).subscribe({
       next: (res) => {
         this.loading.set(false);

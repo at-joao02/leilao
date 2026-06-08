@@ -25,7 +25,7 @@ db.exec(`
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     name         TEXT    NOT NULL,
     email        TEXT    NOT NULL,
-    company      TEXT,
+    phone        TEXT,
     is_anonymous INTEGER NOT NULL DEFAULT 0
   );
 
@@ -65,6 +65,16 @@ db.exec(`
 const artworkCols = db.prepare('PRAGMA table_info(artworks)').all();
 if (!artworkCols.some(c => c.name === 'dimensions')) {
   db.exec('ALTER TABLE artworks ADD COLUMN dimensions TEXT');
+}
+
+// Campo Empresa substituído por Telefone: renomeia a coluna (preservando o esquema)
+const bidderCols = db.prepare('PRAGMA table_info(bidders)').all();
+if (!bidderCols.some(c => c.name === 'phone')) {
+  if (bidderCols.some(c => c.name === 'company')) {
+    db.exec('ALTER TABLE bidders RENAME COLUMN company TO phone');
+  } else {
+    db.exec('ALTER TABLE bidders ADD COLUMN phone TEXT');
+  }
 }
 
 // Backfill: liga obras existentes aos artistas pelo nome

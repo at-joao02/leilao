@@ -55,7 +55,7 @@ router.post('/artworks/:id/bid', async (req, res) => {
     return res.status(400).json({ error: 'O leilão desta obra já encerrou.' });
   }
 
-  const { name, company, amount } = req.body;
+  const { name, phone, amount } = req.body;
 
   // ── Validação de campos obrigatórios ──
   if (!name || typeof name !== 'string' || !name.trim()) {
@@ -76,10 +76,12 @@ router.post('/artworks/:id/bid', async (req, res) => {
   }
 
   // ── Gravar licitante e lance ──
+  const phoneTrimmed = phone && typeof phone === 'string' ? phone.trim() : null;
+
   const bidderId = Bidder.create({
     name: name.trim(),
     email: '',
-    company: company ? company.trim() : null,
+    phone: phoneTrimmed,
   });
 
   Bid.create({ artwork_id: artwork.id, bidder_id: bidderId, amount });
@@ -90,7 +92,7 @@ router.post('/artworks/:id/bid', async (req, res) => {
     artworkTitle: artwork.title,
     artist: artwork.artist,
     bidderName: name.trim(),
-    company: company || null,
+    phone: phoneTrimmed,
     amount,
   }).catch(err => {
     console.error('[mailer] notificação ao admin falhou:', err?.message);
