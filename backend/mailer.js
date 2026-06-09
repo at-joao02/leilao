@@ -1,5 +1,11 @@
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 const nodemailer = require('nodemailer');
+const { Setting } = require('./models');
+
+/** Email que recebe as notificações: definido no admin, com fallback para o .env */
+function notificationRecipient() {
+  return Setting.get('notification_email') || process.env.ADMIN_EMAIL || '';
+}
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -24,7 +30,7 @@ async function sendBidNotificationToAdmin({ artworkTitle, artist, bidderName, ph
 
   await transporter.sendMail({
     from: `"Leilão de Artes" <${process.env.EMAIL_USER}>`,
-    to: process.env.ADMIN_EMAIL,
+    to: notificationRecipient(),
     subject: `Novo lance — ${artworkTitle} — ${formatCurrency(amount)}`,
     html: `
       <h2>Novo lance recebido</h2>
@@ -39,4 +45,4 @@ async function sendBidNotificationToAdmin({ artworkTitle, artist, bidderName, ph
   });
 }
 
-module.exports = { sendBidNotificationToAdmin };
+module.exports = { sendBidNotificationToAdmin, notificationRecipient };

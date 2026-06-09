@@ -63,6 +63,13 @@ export class AdminDashboardComponent implements OnInit {
   deletingArtist      = signal<ArtistRecord | null>(null);
   artistDeleteLoading = signal(false);
 
+  // Definições (email de notificação)
+  notificationEmail = signal('');
+  settingsLoading   = signal(true);
+  settingsSaving    = signal(false);
+  settingsMsg       = signal('');
+  settingsError     = signal('');
+
   // Stats
   stats = computed(() => {
     const list = this.artworks();
@@ -74,7 +81,35 @@ export class AdminDashboardComponent implements OnInit {
     };
   });
 
-  ngOnInit() { this.load(); this.loadArtists(); }
+  ngOnInit() { this.load(); this.loadArtists(); this.loadSettings(); }
+
+  // ── Definições ────────────────────────────────────────────────────────────────
+
+  loadSettings() {
+    this.settingsLoading.set(true);
+    this.adminSvc.getSettings().subscribe({
+      next: (s) => { this.notificationEmail.set(s.notification_email ?? ''); this.settingsLoading.set(false); },
+      error: () => this.settingsLoading.set(false),
+    });
+  }
+
+  saveSettings() {
+    this.settingsMsg.set('');
+    this.settingsError.set('');
+    this.settingsSaving.set(true);
+    this.adminSvc.updateSettings({ notification_email: this.notificationEmail().trim() }).subscribe({
+      next: (s) => {
+        this.notificationEmail.set(s.notification_email ?? '');
+        this.settingsSaving.set(false);
+        this.settingsMsg.set('Email de notificação guardado.');
+        setTimeout(() => this.settingsMsg.set(''), 3000);
+      },
+      error: (err) => {
+        this.settingsSaving.set(false);
+        this.settingsError.set(err?.error?.error ?? 'Erro ao guardar o email.');
+      },
+    });
+  }
 
   load() {
     this.loading.set(true);

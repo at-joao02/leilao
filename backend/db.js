@@ -57,6 +57,11 @@ db.exec(`
     artist_id  INTEGER NOT NULL REFERENCES artists(id),
     PRIMARY KEY (artwork_id, artist_id)
   );
+
+  CREATE TABLE IF NOT EXISTS settings (
+    key   TEXT PRIMARY KEY,
+    value TEXT
+  );
 `);
 
 // ── Migrações ─────────────────────────────────────────────────────────────────

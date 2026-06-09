@@ -3,7 +3,8 @@ const { Router } = require('express');
 const fs = require('fs');
 const path = require('path');
 const db = require('./db');
-const { Artwork, Artist, User } = require('./models');
+const { Artwork, Artist, User, Setting } = require('./models');
+const { notificationRecipient } = require('./mailer');
 
 const UPLOADS_ROOT = path.join(__dirname, '..', 'uploads');
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
@@ -94,6 +95,28 @@ router.post('/login', (req, res) => {
     return res.json({ ok: true });
   }
   res.status(401).json({ error: 'Password incorrecta.' });
+});
+
+// ── GET /admin/settings ───────────────────────────────────────────────────────
+
+router.get('/settings', requireAdmin, (req, res) => {
+  res.json({ notification_email: notificationRecipient() });
+});
+
+// ── PUT /admin/settings ───────────────────────────────────────────────────────
+
+router.put('/settings', requireAdmin, (req, res) => {
+  const { notification_email } = req.body;
+
+  if (notification_email !== undefined) {
+    const email = String(notification_email).trim();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: 'Email inválido.' });
+    }
+    Setting.set('notification_email', email);
+  }
+
+  res.json({ notification_email: notificationRecipient() });
 });
 
 // ── GET /admin/artworks ───────────────────────────────────────────────────────

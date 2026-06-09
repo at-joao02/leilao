@@ -84,6 +84,10 @@ export interface AdminBidsResponse {
   bids: AdminBid[];
 }
 
+export interface AdminSettings {
+  notification_email: string;
+}
+
 export interface ArtworkPayload {
   title: string;
   artist_ids: number[];

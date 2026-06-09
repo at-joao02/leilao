@@ -48,6 +48,44 @@
     </div>
   }
 
+  <!-- Definições: email que recebe os lances -->
+  @if (!settingsLoading()) {
+    <div class="bg-zinc-900 border border-white/5 rounded-2xl p-5">
+      <div class="flex items-start gap-3 mb-3">
+        <div class="w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-white font-semibold text-sm">Email de notificação</h2>
+          <p class="text-zinc-500 text-xs mt-0.5">Para onde são enviados os novos lances. Por cada lance é enviado um email para este endereço.</p>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-2">
+        <input type="email" inputmode="email"
+          [ngModel]="notificationEmail()" (ngModelChange)="notificationEmail.set($event)"
+          placeholder="email@exemplo.com"
+          class="flex-1 bg-zinc-800 border border-white/10 rounded-lg px-3 py-2 text-white text-sm
+                 focus:outline-none focus:border-sky-400/60 transition-colors placeholder:text-zinc-600" />
+        <button (click)="saveSettings()" [disabled]="settingsSaving()"
+          class="inline-flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-500 disabled:opacity-50
+                 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors shrink-0">
+          {{ settingsSaving() ? 'A guardar...' : 'Guardar' }}
+        </button>
+      </div>
+
+      @if (settingsMsg()) {
+        <p class="text-emerald-400 text-xs mt-2">{{ settingsMsg() }}</p>
+      }
+      @if (settingsError()) {
+        <p class="text-red-400 text-xs mt-2">{{ settingsError() }}</p>
+      }
+    </div>
+  }
+
   <!-- Loading skeleton -->
   @if (loading()) {
     <div class="space-y-2">
