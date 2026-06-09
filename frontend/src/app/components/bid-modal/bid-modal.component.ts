@@ -57,14 +57,17 @@ import { BidPayload } from '../../models/auction.models';
               }
             </div>
 
-            <!-- Telefone (opcional) -->
+            <!-- Telefone -->
             <div>
-              <label class="block text-sm text-slate-400 mb-1.5">Telefone <span class="text-slate-500">(opcional)</span></label>
-              <input type="tel" name="phone" inputmode="tel"
-                [(ngModel)]="payload.phone"
+              <label class="block text-sm text-slate-400 mb-1.5">Telefone *</label>
+              <input type="tel" name="phone" inputmode="tel" required
+                [(ngModel)]="payload.phone" #phoneInput="ngModel"
                 class="w-full bg-[#001220] border border-sky-500/20 rounded-lg px-3 py-2.5 text-white text-sm
                        focus:outline-none focus:border-sky-400/60 transition-colors placeholder:text-slate-500"
                 placeholder="Ex.: +244 923 000 000" />
+              @if (phoneInput.invalid && phoneInput.touched) {
+                <p class="text-red-400 text-xs mt-1">Telefone obrigatório.</p>
+              }
             </div>
 
             <!-- Valor -->

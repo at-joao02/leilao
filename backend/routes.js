@@ -61,6 +61,9 @@ router.post('/artworks/:id/bid', async (req, res) => {
   if (!name || typeof name !== 'string' || !name.trim()) {
     return res.status(400).json({ error: 'O campo "name" é obrigatório.' });
   }
+  if (!phone || typeof phone !== 'string' || !phone.trim()) {
+    return res.status(400).json({ error: 'O campo "telefone" é obrigatório.' });
+  }
   if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) {
     return res.status(400).json({ error: 'O valor do lance deve ser um número positivo.' });
   }
