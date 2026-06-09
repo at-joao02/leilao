@@ -138,6 +138,31 @@ router.get('/artworks/:id/bids', requireAdmin, (req, res) => {
   res.json({ artwork, bids });
 });
 
+// ── DELETE /admin/artworks/:id/bids ───────────────────────────────────────────
+
+router.delete('/artworks/:id/bids', requireAdmin, (req, res) => {
+  const artwork = Artwork.findById(req.params.id);
+  if (!artwork) return res.status(404).json({ error: 'Obra não encontrada.' });
+
+  const clear = db.transaction(() => {
+    const bidderIds = db.prepare('SELECT DISTINCT bidder_id FROM bids WHERE artwork_id = ?')
+      .all(artwork.id).map(r => r.bidder_id);
+
+    db.prepare('DELETE FROM bids WHERE artwork_id = ?').run(artwork.id);
+
+    // Remove licitantes que já não têm lances em nenhuma obra
+    for (const bidderId of bidderIds) {
+      const stillUsed = db.prepare('SELECT 1 FROM bids WHERE bidder_id = ? LIMIT 1').get(bidderId);
+      if (!stillUsed) db.prepare('DELETE FROM bidders WHERE id = ?').run(bidderId);
+    }
+
+    db.prepare('UPDATE artworks SET current_price = starting_price WHERE id = ?').run(artwork.id);
+  });
+  clear();
+
+  res.json({ message: 'Lances eliminados.' });
+});
+
 // ── POST /admin/artworks ──────────────────────────────────────────────────────
 
 router.post('/artworks', requireAdmin, (req, res) => {

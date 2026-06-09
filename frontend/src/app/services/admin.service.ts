@@ -38,6 +38,10 @@ export class AdminService {
     return this.http.get<AdminBidsResponse>(`${this.base}/artworks/${artworkId}/bids`, { headers: this.headers() });
   }
 
+  clearBids(artworkId: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.base}/artworks/${artworkId}/bids`, { headers: this.headers() });
+  }
+
   createArtwork(payload: ArtworkPayload): Observable<Artwork> {
     return this.http.post<Artwork>(`${this.base}/artworks`, payload, { headers: this.headers() });
   }

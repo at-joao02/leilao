@@ -37,10 +37,13 @@ export class AdminDashboardComponent implements OnInit {
   formError   = signal('');
 
   // Bids modal
-  showBids    = signal(false);
-  bidsTitle   = signal('');
-  bids        = signal<AdminBid[]>([]);
-  bidsLoading = signal(false);
+  showBids        = signal(false);
+  bidsTitle       = signal('');
+  bidsArtworkId   = signal<number | null>(null);
+  bids            = signal<AdminBid[]>([]);
+  bidsLoading     = signal(false);
+  confirmClearBids = signal(false);
+  clearingBids    = signal(false);
 
   // Delete confirm modal
   showDelete     = signal(false);
@@ -140,12 +143,29 @@ export class AdminDashboardComponent implements OnInit {
 
   openBids(a: AdminArtwork) {
     this.bidsTitle.set(a.title);
+    this.bidsArtworkId.set(a.id);
+    this.confirmClearBids.set(false);
     this.bids.set([]);
     this.bidsLoading.set(true);
     this.showBids.set(true);
     this.adminSvc.getBids(a.id).subscribe({
       next: (res) => { this.bids.set(res.bids); this.bidsLoading.set(false); },
       error: ()  => { this.bidsLoading.set(false); },
+    });
+  }
+
+  clearBids() {
+    const id = this.bidsArtworkId();
+    if (id == null) return;
+    this.clearingBids.set(true);
+    this.adminSvc.clearBids(id).subscribe({
+      next: () => {
+        this.clearingBids.set(false);
+        this.confirmClearBids.set(false);
+        this.bids.set([]);
+        this.load(); // atualiza nº de lances e preço actual na grelha
+      },
+      error: () => this.clearingBids.set(false),
     });
   }
 
